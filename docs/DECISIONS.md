@@ -46,5 +46,8 @@ Checked on this machine (Windows, Git Bash), 2026-11-05 ~16:40 UTC.
 
 ---
 
+## Execution deviation · 01 §13.1 (2026-11-05 ~17:30 UTC)
+**Builders run as `general-purpose` subagents with a Sonnet 5.5 model override, not a `builder` subagent type.** Reason: this desktop session does not register project `.claude/agents/*.md` files (they load at session start), so `subagent_type: "builder"` is unavailable; `builder.md` was still created per §13.1 for terminal sessions. Every builder prompt inlines the §13.1 builder instructions (read spec → touch only owned files → karpathy-guidelines → write + run the WP's tests → finish with the `WP <id>: done|blocked, …` report). Model = Sonnet 5.5 (alias "sonnet"), matching §13.1's Opus-plans/Sonnet-codes split; no Fable or Mythos anywhere (§0.1).
+
 ## Timeline note
 01 §13.3 scheduled WP-A for Nov 5 12:00–15:00 UTC; we're past that window (~16:40 UTC now). Wave-1 window (15:00–22:00) is open but **held** on the two blockers above. No change to the plan shape.
