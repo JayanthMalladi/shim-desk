@@ -109,3 +109,11 @@ Proactively applied the §7.5 fallback: added `"ask": ["Bash(git -C work/* push*
 
 ## WSL host prep progress (2026-11-06 ~01:35 UTC, lead)
 Lead completed (user-authorized): `gh` installed in WSL Ubuntu (`/usr/local/bin/gh`, v2.103.3); `wsl-switch` SSH alias added to `~/.ssh/config` (HostName 172.18.66.224, root, id_ed25519, accept-new) — alias login verified: `gh` + `claude` reachable. WP-I pre-staged (README skeleton with WSL note + `{{...}}` placeholders, demo-script.md, architecture.svg drafted) so post-H work is fill-in-numbers only. Still user-side: claude sign-in on WSL, `gh auth login` on WSL, Console Add host + agents on WSL host, room setup + dry run.
+
+## Option-B execution (01 §6.1 fallback path, 2026-11-05 ~22:00–23:30 UTC)
+After the #1472 Add-host failures, Option B (Windows Console + WSL host) was executed via two parallel subagents (W = Windows ssh-agent, H = WSL user+repo). Verified results:
+- **W:** `HKCU\Environment\SSH_AUTH_SOCK = \.\pipe\openssh-ssh-agent` (correct); key is in the *service* ssh-agent (`ssh-add -l` shows SHA256:X+hA...jGj24); `~/.ssh/config` `wsl-switch` = `User jayanth` + `IdentityFile C:/Users/Jayanth/.ssh/id_ed25519` + `StrictHostKeyChecking accept-new` (Windows-path style for Console's Go ssh library).
+- **H:** WSL user `jayanth` (uid 1000, NOPASSWD sudo), `~/.ssh/authorized_keys` is byte-identical to the Windows pub (SHA256 7e4e7bc5...), tools resolve (node v22.22.1, git 2.53.0, gh 2.103.3, claude 2.1.318), repo cloned to `/home/jayanth/shim-desk` (HEAD `441ec8d` = origin/main, no drift), sshd running (pid 955).
+- Lead's cross-check: from a fresh Windows process, `ssh wsl-switch` → **ALIAS-OK**; W's earlier "permission denied, waiting on H" was a race (W probed before H finished writing authorized_keys) — resolved.
+- **Credential handoff (user):** WSL `claude` sign-in + trust + `gh auth login`/`setup-git` completed by Jayanth on jayanth's home (~23:15 UTC).
+- Remaining: Console "Add host" (first attempt with corrected registry value — untested case), host Recheck → Ready, agent re-creation on host (`directory=/home/jayanth/shim-desk`), room smoke check. W noted that the **user-session** `ssh-agent` that W started is temporary (dies on logoff/reboot); for the demo window, the service agent pipe is the persisted path.
