@@ -1,0 +1,299 @@
+{
+  "runId": "r-0000",
+  "repo": "JayanthMalladi/shim-demo-app",
+  "migration": "ai-sdk-v7",
+  "requestedBy": "Jayanth",
+  "room": "shim-desk",
+  "createdAt": "2026-11-06T09:02:00Z",
+  "updatedAt": "2026-11-06T09:31:00Z",
+  "status": "done",
+  "findings": {
+    "total": 32,
+    "files": 5,
+    "bySeverity": { "break": 6, "silent": 18, "deprecated": 8 },
+    "byFix": { "auto": 9, "agent": 4, "manual": 3 },
+    "top": {
+      "ruleId": "multi-step-result",
+      "severity": "silent",
+      "fix": "agent",
+      "file": "src/billing.ts",
+      "line": 15,
+      "snippet": "const billed = result.usage.totalTokens;",
+      "message": "In AI SDK 7, result.usage counts every step of a multi-step call, so billing over-counts tokens. tsc will not catch it."
+    },
+    "items": [
+      {
+        "ruleId": "esm-only",
+        "severity": "break",
+        "fix": "manual",
+        "file": "src/legacy.cjs",
+        "line": 1,
+        "snippet": "const { generateText } = require('ai');",
+        "message": "ai@7 is ESM-only. require('ai') throws at import. Convert this file to ESM."
+      },
+      {
+        "ruleId": "multi-step-result",
+        "severity": "silent",
+        "fix": "agent",
+        "file": "src/billing.ts",
+        "line": 15,
+        "snippet": "const billed = result.usage.totalTokens;",
+        "message": "In AI SDK 7, result.usage counts every step of a multi-step call, so billing over-counts tokens. Use result.finalStep.usage to preserve v6 behavior."
+      },
+      {
+        "ruleId": "typed-multi-step-result",
+        "severity": "silent",
+        "fix": "agent",
+        "file": "src/typed.ts",
+        "line": 22,
+        "snippet": "const out = result.response.messages.length;",
+        "message": "In AI SDK 7, multi-step results no longer carry response.messages. Map to result.responseMessages only where full history was intended."
+      },
+      {
+        "ruleId": "response-messages",
+        "severity": "silent",
+        "fix": "agent",
+        "file": "src/messages.ts",
+        "line": 8,
+        "snippet": "return response.messages[0] ?? null;",
+        "message": "response.messages was removed in AI SDK 7. Use responseMessages for the full history, or response.text where only the answer was needed."
+      },
+      {
+        "ruleId": "multi-step-end-event",
+        "severity": "deprecated",
+        "fix": "agent",
+        "file": "src/stream.ts",
+        "line": 31,
+        "snippet": "onFinish: (ev) => log(ev.responseId)",
+        "message": "onFinish now receives a multi-step object. The v6 finish event is at onFinish.parts of finishStep. Access finishStep.responseId."
+      },
+      {
+        "ruleId": "usage-object",
+        "severity": "deprecated",
+        "fix": "auto",
+        "file": "src/billing.ts",
+        "line": 18,
+        "message": "usage.promptTokens/usage.completionTokens renamed to inputTokens/outputTokens. Codemod applied."
+      },
+      {
+        "ruleId": "telemetry-needs-otel",
+        "severity": "deprecated",
+        "fix": "manual",
+        "file": "src/index.ts",
+        "line": 5,
+        "message": "Experimental telemetry API moved to @ai-sdk/otel in AI SDK 7. Add the package or disable telemetry."
+      },
+      {
+        "ruleId": "openai-provider-major",
+        "severity": "deprecated",
+        "fix": "auto",
+        "file": "src/providers.ts",
+        "line": 12,
+        "message": "@ai-sdk/openai@3 required by ai@7. Version bump applied to package.json."
+      },
+      {
+        "ruleId": "generate-text-options",
+        "severity": "break",
+        "fix": "auto",
+        "file": "src/prompt.ts",
+        "line": 40,
+        "message": "maxTokens option renamed to maxOutputTokens. Codemod applied."
+      },
+      {
+        "ruleId": "system-prompt-string",
+        "severity": "break",
+        "fix": "auto",
+        "file": "src/prompt.ts",
+        "line": 11,
+        "message": "System message passed as bare string; ai@7 requires a SystemModelMessage object. Codemod applied."
+      }
+    ]
+  },
+  "decisions": [
+    {
+      "ruleId": "esm-only",
+      "question": "src/legacy.cjs requires 'ai', which is ESM-only in v7. Convert the file to ESM, or leave it and open the PR as draft?",
+      "options": [
+        "Convert src/legacy.cjs to ESM (recommended)",
+        "Leave it and mark the PR as draft"
+      ],
+      "choice": 1,
+      "by": "Jayanth",
+      "at": "2026-11-06T09:06:30Z"
+    },
+    {
+      "ruleId": "telemetry-needs-otel",
+      "question": "The experimental telemetry call needs @ai-sdk/otel in v7. Add the package, or leave telemetry off and note it in the PR?",
+      "options": [
+        "Add @ai-sdk/otel and register it",
+        "Leave telemetry off and say so in the PR"
+      ],
+      "choice": 2,
+      "by": "Jayanth",
+      "at": "2026-11-06T09:08:10Z"
+    }
+  ],
+  "autoFixed": 9,
+  "fixes": [
+    {
+      "file": "src/typed.ts",
+      "status": "done",
+      "summary": "response.messages -> responseMessages for full history, behavior preserved",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "file": "src/messages.ts",
+      "status": "done",
+      "summary": "Use responseMessages only where history was intended; else text",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "file": "src/stream.ts",
+      "status": "done",
+      "summary": "onFinish reads finishStep.responseId, matching v6 finish event",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "file": "src/billing.ts",
+      "status": "done",
+      "summary": "tokensToBill now uses result.finalStep.usage; test passes",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "gates": {
+    "baseline": { "install": true, "build": true, "typecheck .": true, "test .": true },
+    "after": { "install": true, "build": true, "typecheck .": true, "test .": true },
+    "regressions": []
+  },
+  "review": {
+    "by": "shim-reviewer.jayanth",
+    "verdict": "approve",
+    "notes": [
+      "usage -> finalStep.usage in src/billing.ts preserves the final-step semantics the test asserts.",
+      "Legacy ESM conversion is complete; no CJS require of 'ai' remains."
+    ],
+    "rounds": 1
+  },
+  "approval": {
+    "by": "Jayanth",
+    "at": "2026-11-06T09:29:40Z"
+  },
+  "pr": {
+    "url": "https://github.com/JayanthMalladi/shim-demo-app/pull/1",
+    "branch": "shim/ai-sdk-7-r-0000",
+    "filesChanged": 8,
+    "additions": 132,
+    "deletions": 97
+  },
+  "events": [
+    {
+      "t": "2026-11-06T09:02:00Z",
+      "kind": "status",
+      "actor": "Jayanth",
+      "text": "Requested: upgrade ai to v7 in JayanthMalladi/shim-demo-app",
+      "status": "requested"
+    },
+    {
+      "t": "2026-11-06T09:02:30Z",
+      "kind": "status",
+      "actor": "shim-lead.jayanth",
+      "text": "Cloning JayanthMalladi/shim-demo-app into work/r-0000",
+      "status": "cloning"
+    },
+    {
+      "t": "2026-11-06T09:04:10Z",
+      "kind": "status",
+      "actor": "shim-lead.jayanth",
+      "text": "Scan complete: 32 findings in 5 files",
+      "status": "scanned"
+    },
+    {
+      "t": "2026-11-06T09:05:00Z",
+      "kind": "message",
+      "actor": "shim-lead.jayanth",
+      "text": "Most important silent change: result.usage in src/billing.ts:15 now counts every step, so billing would over-count tokens and tsc won't catch it."
+    },
+    {
+      "t": "2026-11-06T09:06:30Z",
+      "kind": "decision",
+      "actor": "Jayanth",
+      "text": "esm-only: choice 1, convert src/legacy.cjs to ESM",
+      "status": "awaiting_decision"
+    },
+    {
+      "t": "2026-11-06T09:08:10Z",
+      "kind": "decision",
+      "actor": "Jayanth",
+      "text": "telemetry-needs-otel: choice 2, leave telemetry off and note it in the PR",
+      "status": "awaiting_decision"
+    },
+    {
+      "t": "2026-11-06T09:09:00Z",
+      "kind": "status",
+      "actor": "shim-lead.jayanth",
+      "text": "Shim applied 9 deterministic fixes; gates re-run clean",
+      "status": "fixing_deterministic"
+    },
+    {
+      "t": "2026-11-06T09:14:00Z",
+      "kind": "status",
+      "actor": "shim-lead.jayanth",
+      "text": "Fixing 4 files in parallel: src/typed.ts, src/messages.ts, src/stream.ts, src/billing.ts",
+      "status": "fixing_parallel"
+    },
+    {
+      "t": "2026-11-06T09:18:20Z",
+      "kind": "fix",
+      "actor": "shim-fixer:src/typed.ts",
+      "text": "done: response.messages -> responseMessages, behavior preserved"
+    },
+    {
+      "t": "2026-11-06T09:19:05Z",
+      "kind": "fix",
+      "actor": "shim-fixer:src/messages.ts",
+      "text": "done: responseMessages where history intended; text where not"
+    },
+    {
+      "t": "2026-11-06T09:21:40Z",
+      "kind": "fix",
+      "actor": "shim-fixer:src/stream.ts",
+      "text": "done: onFinish reads finishStep.responseId"
+    },
+    {
+      "t": "2026-11-06T09:24:15Z",
+      "kind": "fix",
+      "actor": "shim-fixer:src/billing.ts",
+      "text": "done: tokensToBill uses result.finalStep.usage; test passes"
+    },
+    {
+      "t": "2026-11-06T09:26:00Z",
+      "kind": "gate",
+      "actor": "shim-lead.jayanth",
+      "text": "Gates green: install, build, typecheck ., test . — no regressions"
+    },
+    {
+      "t": "2026-11-06T09:28:00Z",
+      "kind": "review",
+      "actor": "shim-reviewer.jayanth",
+      "text": "VERDICT: approve. Every changed line traces to a finding or a recorded decision."
+    },
+    {
+      "t": "2026-11-06T09:29:40Z",
+      "kind": "approval",
+      "actor": "Jayanth",
+      "text": "Approved: open the PR on JayanthMalladi/shim-demo-app",
+      "status": "awaiting_approval"
+    },
+    {
+      "t": "2026-11-06T09:31:00Z",
+      "kind": "pr",
+      "actor": "shim-lead.jayanth",
+      "text": "PR opened: https://github.com/JayanthMalladi/shim-demo-app/pull/1",
+      "status": "done"
+    }
+  ]
+}

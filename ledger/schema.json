@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ShimDeskRun",
+  "type": "object",
+  "required": ["runId", "repo", "requestedBy", "createdAt", "status", "events"],
+  "properties": {
+    "runId":       { "type": "string", "pattern": "^r-\\d{4}$" },
+    "repo":        { "type": "string", "pattern": "^[^/]+/[^/]+$" },
+    "migration":   { "type": "string", "const": "ai-sdk-v7" },
+    "requestedBy": { "type": "string" },
+    "room":        { "type": "string", "default": "shim-desk" },
+    "createdAt":   { "type": "string", "format": "date-time" },
+    "updatedAt":   { "type": "string", "format": "date-time" },
+    "status": { "enum": ["requested","cloning","scanned","awaiting_decision","fixing_deterministic","fixing_parallel","gating","in_review","awaiting_approval","opening_pr","done","blocked","failed"] },
+    "statusReason": { "type": "string" },
+    "findings": {
+      "type": "object",
+      "properties": {
+        "total": {"type":"integer"}, "files": {"type":"integer"},
+        "bySeverity": {"type":"object","properties":{"break":{"type":"integer"},"silent":{"type":"integer"},"deprecated":{"type":"integer"}}},
+        "byFix": {"type":"object","properties":{"auto":{"type":"integer"},"agent":{"type":"integer"},"manual":{"type":"integer"}}},
+        "top": { "$ref": "#/$defs/finding" },
+        "items": { "type": "array", "items": { "$ref": "#/$defs/finding" } }
+      }
+    },
+    "decisions": { "type": "array", "items": { "type": "object", "required": ["ruleId","question","choice","by","at"],
+      "properties": { "ruleId":{"type":"string"}, "question":{"type":"string"}, "options":{"type":"array","items":{"type":"string"}}, "choice":{"type":"integer"}, "by":{"type":"string"}, "at":{"type":"string","format":"date-time"} } } },
+    "autoFixed": { "type": "integer" },
+    "fixes": { "type": "array", "items": { "type": "object", "properties": { "file":{"type":"string"}, "status":{"enum":["done","blocked"]}, "summary":{"type":"string"}, "agent":{"type":"string","default":"shim-fixer"}, "model":{"type":"string"} } } },
+    "gates": { "type": "object", "properties": { "baseline": {"type":"object","additionalProperties":{"type":"boolean"}}, "after": {"type":"object","additionalProperties":{"type":"boolean"}}, "regressions": {"type":"array","items":{"type":"string"}} } },
+    "review": { "type": "object", "properties": { "by":{"type":"string"}, "verdict":{"enum":["approve","changes"]}, "notes":{"type":"array","items":{"type":"string"}}, "rounds":{"type":"integer"} } },
+    "approval": { "type": "object", "properties": { "by":{"type":"string"}, "at":{"type":"string","format":"date-time"} } },
+    "pr": { "type": "object", "properties": { "url":{"type":"string"}, "branch":{"type":"string"}, "filesChanged":{"type":"integer"}, "additions":{"type":"integer"}, "deletions":{"type":"integer"} } },
+    "events": { "type": "array", "items": { "type": "object", "required": ["t","kind"], "properties": {
+      "t": {"type":"string","format":"date-time"},
+      "kind": {"enum":["status","message","decision","fix","gate","review","approval","pr","error"]},
+      "actor": {"type":"string", "description": "human handle, shim-lead.jayanth, shim-reviewer.jayanth, or shim-fixer:<file>"},
+      "text": {"type":"string"},
+      "status": {"type":"string"} } } }
+  },
+  "$defs": {
+    "finding": { "type": "object", "required": ["ruleId","severity","fix","file","line","message"],
+      "properties": { "ruleId":{"type":"string"}, "severity":{"enum":["break","silent","deprecated"]}, "fix":{"enum":["auto","agent","manual"]}, "file":{"type":"string"}, "line":{"type":"integer"}, "snippet":{"type":"string"}, "message":{"type":"string"} } }
+  }
+}

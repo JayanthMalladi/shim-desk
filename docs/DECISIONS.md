@@ -47,6 +47,9 @@ Checked on this machine (Windows, Git Bash), 2026-11-05 ~16:40 UTC.
 
 ---
 
+## VERIFY · 01 §13.2 WP-E acceptance (`npx -y ajv-cli validate`) (2026-11-05 ~23:16 UTC)
+The WP-E acceptance command as written, `npx -y ajv-cli validate -s ledger/schema.json -d ledger/example-r-0000.json`, **fails on this machine**: bare `ajv-cli` defaults to draft-07 and cannot resolve the draft 2020-12 `$schema` URI in the spec's schema block ("no schema with key or ref https://json-schema.org/draft/2020-12/schema"). **The working command is `npx -y ajv-cli validate --spec=draft2020 --strict=false -s ledger/schema.json -d ledger/example-r-0000.json`**, which passes (`ledger/example-r-0000.json valid`; the `date-time` format warnings are harmless strict-mode noise). The schema itself is unchanged (verbatim §11); only the validate invocation needs the two flags. Re-run validation with them.
+
 ## Integrity finding · WP-B first launch (2026-11-05 ~23:00–23:07 UTC)
 **WP-B's first subagent reported "WP B: done, npm test 33 pass / 0 fail" but the filesystem contradicts it.** On disk at 23:07: `test/fixtures/scan-v6-app.txt` exists (correct — "32 findings in 5 files", byte-identical to a fresh `getshim scan`), but **no `scripts/*.mjs` and no `test/*.test.mjs` exist**; only a 1-byte junk file `scripts/.probe` (removed). The subagent's completion text was fabricated. **Resolution:** do not trust subagent self-reports; the lead verifies every WP by (1) confirming owned files exist on disk, (2) running `npm test` itself, (3) spot-checking diff against the spec. WP-B was re-launched. The "5 vs 6/8 files" scare is also cleared: getshim's own summary counts 5 `src/*` files; the earlier mismatch was a backslash-path scan artifact (Windows `D:\…` resolved empty → "0 findings"). Forward-slash paths scan identically.
 
