@@ -21,6 +21,7 @@ Checked on this machine (Windows, Git Bash), 2026-11-05 ~16:40 UTC.
 | Claude Code | ✅ `2.1.296` | on PATH; `claude mcp add` works. |
 | `getshim@0.1.0` | ✅ runs on this Node | no-arg usage exits 0 (matches 01 §9.4 doctor expectation). |
 | `karpathy-guidelines` skill | ✅ present at `~/.claude/skills/karpathy-guidelines/SKILL.md` | **Deviates from 01 §7.2**: it is a *personal* skill, not the `forrestchang/andrej-karpathy-skills` plugin marketplace entry. Content is the genuine Karpathy LLM-coding-guidelines doc, so it satisfies the intent. No action needed; noting the discrepancy. |
+| 01 §7.2 build-time plugins | ✅ **installed 2026-11-05 ~17:35 UTC** | `claude plugin marketplace add anthropics/skills` + `forrestchang/andrej-karpathy-skills`, then `claude plugin install example-skills@anthropic-agent-skills` and `andrej-karpathy-skills@karpathy-skills` (user scope). Verified on disk: `skill-creator`, `frontend-design`, `webapp-testing`, `mcp-builder` (example-skills) and `karpathy-guidelines` (karpathy-skills) are exposed. Note: plugins installed mid-session appear to *new* subagent sessions; the running wave-1 builders were pointed at the personal-skill copy and are unaffected. |
 | Switch docs MCP (01 §6.7) | ✅ added | `claude mcp add switch-docs --transport http https://docs.switchagents.ai/mcp` → local config for `D:\shim-desk`. |
 
 ### Shim fixture (01 §9.5, §12 source)
@@ -45,6 +46,9 @@ Checked on this machine (Windows, Git Bash), 2026-11-05 ~16:40 UTC.
 **GO — declared by Jayanth, 2026-11-05 ~17:25 UTC**, with all infrastructure green (Mattermost container healthy, Console running, Docker up). The GUI smoke test was delegated to Jayanth's manual check of the Console; Wave 1 (B/C/D/E) is unblocked. The room-level `@agent` skill check is re-run during WP-H.
 
 ---
+
+## Execution deviation · 01 §5 test script (2026-11-05 ~23:15 UTC)
+**`"test": "node --test test/"` fails on this machine** (Node v22.15.0, Windows): the directory-argument form errors with `Cannot find module 'D:\shim-desk\test'` (Node treats the dir arg as a module path). Empirically verified: `node --test` (no-arg auto-discover) and `node --test "test/*.test.mjs"` both discover and run `test/*.test.mjs` correctly (probe: 2/2 pass). **Deviation:** root `package.json` script changed to `"test": "node --test"`. All WPs run tests via `npm test`.
 
 ## Execution deviation · 01 §13.1 (2026-11-05 ~17:30 UTC)
 **Builders run as `general-purpose` subagents with a Sonnet 5.5 model override, not a `builder` subagent type.** Reason: this desktop session does not register project `.claude/agents/*.md` files (they load at session start), so `subagent_type: "builder"` is unavailable; `builder.md` was still created per §13.1 for terminal sessions. Every builder prompt inlines the §13.1 builder instructions (read spec → touch only owned files → karpathy-guidelines → write + run the WP's tests → finish with the `WP <id>: done|blocked, …` report). Model = Sonnet 5.5 (alias "sonnet"), matching §13.1's Opus-plans/Sonnet-codes split; no Fable or Mythos anywhere (§0.1).
