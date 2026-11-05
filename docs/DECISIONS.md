@@ -96,3 +96,6 @@ getshim's scan tail "32 findings in **5 files**" is getshim's internal `filesSca
 
 ## Timeline note
 01 §13.3 scheduled WP-A for Nov 5 12:00–15:00 UTC; we're past that window (~16:40 UTC now). Wave-1 window (15:00–22:00) is open but **held** on the two blockers above. No change to the plan shape.
+
+## VERIFY · 01 §7.5 permission-request guarantee (2026-11-06, added BEFORE WP-H dry run)
+Proactively applied the §7.5 fallback: added `"ask": ["Bash(git -C work/* push*)", "Bash(git -C work/*/* push*)", "Bash(gh pr create*)"]` to `.claude/settings.json` so the PR-push step CANNOT be silently auto-approved under the agents' Auto mode — it will always produce the in-room Switch permission request (the demo moment, 01 §3 step 7 / §14 checklist). The `allow` list is otherwise untouched (§7.5 verbatim). During the H dry run: at the approval step, the room should show the permission request — Jayanth clicks Allow once in the room. If no request appears, record it here and re-run the approval step (idempotent per §9.6).

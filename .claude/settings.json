@@ -22,6 +22,11 @@
       "Edit(./switch/**)",
       "Bash(gh pr merge *)",
       "Bash(gh issue *)"
+    ],
+    "ask": [
+      "Bash(git -C work/* push*)",
+      "Bash(git -C work/*/* push*)",
+      "Bash(gh pr create*)"
     ]
   }
 }
