@@ -1,0 +1,6 @@
+# node_modules, work/, .switch/, ui/dist, *.log  (01-WORKFLOW-SPEC §5)
+node_modules/
+work/
+.switch/
+ui/dist/
+*.log
