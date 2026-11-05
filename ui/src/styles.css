@@ -1,0 +1,422 @@
+/* Shim Desk — Ledger Board design system (02-UI-SPEC §4).
+ *
+ * A calm operations ledger: light by default, full dark mode via
+ * prefers-color-scheme. Tokens on :root, redefined in the dark media query.
+ * No AI-slop tells: no purple gradients, no glows, no gradient text, no
+ * glassy blobs, no pulsing elements. The only exception is a single static
+ * "live" dot for in-progress runs (.live-dot).
+ */
+
+/* ------------------------------------------------------------------ */
+/* Design tokens — light (default)                                      */
+/* ------------------------------------------------------------------ */
+:root {
+  color-scheme: light;
+
+  /* Color tokens (02 §4 table). */
+  --bg: #FAFAF7;
+  --surface: #FFFFFF;
+  --border: #E6E4DE;
+  --text: #1C1B19;
+  --muted: #6B6862;
+  --accent: #2F5D50;
+  --ok: #2E7D4F;
+  --warn: #B26B00;
+  --bad: #B3261E;
+  --silent: #7A4FB5;
+
+  /* Radius + spacing scale (4/8/12/16/24/32/48). */
+  --radius-card: 8px;
+  --radius-pill: 999px;
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+
+  /* Type: system UI stack for text, mono for paths / rule ids / run ids. */
+  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+    monospace;
+  --text-base: 15px;
+  --line-height: 1.5;
+
+  /* Layout: max content width 1040px, centred. */
+  --content-max: 1040px;
+  --gutter: 16px;
+
+  /* Focus ring (visible, WCAG AA). */
+  --focus-ring: 2px solid var(--accent);
+}
+
+/* Dark mode: redefine the color tokens only; layout/type stay the same. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #121212;
+    --surface: #1B1B1B;
+    --border: #2C2C2C;
+    --text: #EDEDEA;
+    --muted: #A3A09A;
+    --accent: #7FB8A6;
+    --ok: #5CC48A;
+    --warn: #E0A240;
+    --bad: #F2766E;
+    --silent: #B79BE0;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                               */
+/* ------------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: var(--text-base); /* 15px base */
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  line-height: var(--line-height);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Centred content column; the 16px side gutter on phones comes from
+ * --gutter. No horizontal scroll at 375px (tables scroll inside their own
+ * .table-scroll wrapper below). */
+.page {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--s5) var(--gutter) var(--s7);
+}
+
+/* Keyboard focus must always be visible (WCAG AA). */
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible,
+input:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Mono class for file paths, rule ids and run ids. */
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+/* Secondary text. */
+.muted {
+  color: var(--muted);
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 2px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 var(--s3);
+  line-height: 1.25;
+}
+
+/* ------------------------------------------------------------------ */
+/* Header (.header)                                                   */
+/* ------------------------------------------------------------------ */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  flex-wrap: wrap;
+  padding-bottom: var(--s4);
+  border-bottom: 1px solid var(--border);
+}
+
+.header__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.header__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  flex-wrap: wrap;
+}
+
+/* "Live" badge (dev only) + link on the right. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* The one allowed "live" element: a single static (non-pulsing) dot. */
+.live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ok);
+  flex: 0 0 auto;
+}
+.live-dot[data-state="stale"],
+.live-dot[aria-live="polite"][data-stopped="true"] {
+  background: var(--muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* Status pill (.status-pill) + color modifier classes               */
+/* ------------------------------------------------------------------ */
+/* Never color alone: the pill always shows text, and the modifier
+ * classes add color via a subtle tint so the color is a redundant cue. */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+  padding: 2px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.4;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.status-pill .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+/* Per-token modifiers (accent / ok / warn / bad / silent). */
+.status-pill.accent {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+}
+.status-pill.accent .dot {
+  background: var(--accent);
+}
+
+.status-pill.ok {
+  border-color: var(--ok);
+  color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 12%, var(--surface));
+}
+.status-pill.ok .dot {
+  background: var(--ok);
+}
+
+.status-pill.warn {
+  border-color: var(--warn);
+  color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 12%, var(--surface));
+}
+.status-pill.warn .dot {
+  background: var(--warn);
+}
+
+.status-pill.bad {
+  border-color: var(--bad);
+  color: var(--bad);
+  background: color-mix(in srgb, var(--bad) 12%, var(--surface));
+}
+.status-pill.bad .dot {
+  background: var(--bad);
+}
+
+.status-pill.silent {
+  border-color: var(--silent);
+  color: var(--silent);
+  background: color-mix(in srgb, var(--silent) 12%, var(--surface));
+}
+.status-pill.silent .dot {
+  background: var(--silent);
+}
+
+/* ------------------------------------------------------------------ */
+/* Stage track (.stage-track), full + compact variants               */
+/* ------------------------------------------------------------------ */
+.stage-track {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto; /* the track scrolls inside itself on narrow screens */
+  padding: var(--s1) 0;
+  margin: 0;
+}
+
+.stage-track__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 0;
+  min-width: 52px;
+  position: relative;
+  background: none;
+  border: 0;
+  padding: var(--s1) 0;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+}
+
+/* Label under the marker. */
+.stage-track__label {
+  margin-top: var(--s1);
+  font-size: 0.7rem;
+  line-height: 1.2;
+  color: var(--muted);
+}
+.stage-track__item[data-state="done"] .stage-track__label,
+.stage-track__item[data-state="current"] .stage-track__label,
+.stage-track__item[data-state="waiting"] .stage-track__label,
+.stage-track__item[data-state="current-hollow"] .stage-track__label {
+  color: var(--text);
+}
+
+/* The marker (circle). Hollow vs solid states. */
+.stage-track__marker {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  flex: 0 0 auto;
+}
+
+/* Marker states. */
+.stage-track__item[data-state="done"] .stage-track__marker {
+  background: var(--ok);
+  border-color: var(--ok);
+}
+.stage-track__item[data-state="current"] .stage-track__marker {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.stage-track__item[data-state="waiting"] .stage-track__marker {
+  background: var(--warn);
+  border-color: var(--warn);
+}
+/* Stopped (blocked/failed): reached but not completed — hollow. */
+.stage-track__item[data-state="current-hollow"] .stage-track__marker {
+  background: var(--surface);
+  border-color: var(--warn);
+}
+
+/* Compact variant: one line of dots, no labels. */
+.stage-track.compact {
+  overflow-x: auto;
+  padding: 0;
+}
+.stage-track.compact .stage-track__item {
+  flex: 0 0 auto;
+  min-width: 20px;
+  justify-content: center;
+}
+.stage-track.compact .stage-track__marker {
+  width: 10px;
+  height: 10px;
+  border-width: 2px;
+}
+.stage-track.compact .stage-track__label {
+  display: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Card (.card)                                                       */
+/* ------------------------------------------------------------------ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--s4);
+  margin-bottom: var(--s4);
+}
+
+/* ------------------------------------------------------------------ */
+/* Chip (.chip)                                                        */
+/* ------------------------------------------------------------------ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+  padding: 1px 10px;
+  font-size: 0.8rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  white-space: nowrap;
+}
+.chip.silent {
+  border-color: var(--silent);
+  color: var(--silent);
+}
+.chip.muted {
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* Table (.table) + scroll container (.table-scroll)                  */
+/* ------------------------------------------------------------------ */
+/* On narrow screens the table scrolls inside its own container — no
+ * horizontal scroll at the page level. */
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.table th,
+.table td {
+  text-align: left;
+  padding: var(--s2) var(--s3);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.table th {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.table tr:last-child td {
+  border-bottom: 0;
+}
+.table .pass {
+  color: var(--ok);
+}
+.table .fail {
+  color: var(--bad);
+}
