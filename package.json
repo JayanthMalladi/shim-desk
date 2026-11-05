@@ -1,0 +1,15 @@
+{
+  "name": "shim-desk",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "doctor": "node scripts/doctor.mjs",
+    "test": "node --test test/",
+    "ui": "npm --prefix ui run dev",
+    "ui:build": "npm --prefix ui run build",
+    "setup": "node scripts/doctor.mjs && npm --prefix ui install"
+  }
+}

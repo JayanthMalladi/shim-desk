@@ -42,7 +42,7 @@ Checked on this machine (Windows, Git Bash), 2026-11-05 ~16:40 UTC.
 - Smoke acceptance (01 §13.2): a throwaway Claude Code agent answers an `@` in a room, and `@agent list your skills` names a test project skill.
 
 ### GO/NO-GO
-**Conditional, one step away.** Infrastructure is fully green. Once the user completes the §6.2 console steps and one agent answers in a room, the plan is **GO** and Wave 1 (B/C/D/E) starts. Until then, do not write workflow/UI code — per 01 §6.1 and §13.2, the smoke test gates everything.
+**GO — declared by Jayanth, 2026-11-05 ~17:25 UTC**, with all infrastructure green (Mattermost container healthy, Console running, Docker up). The GUI smoke test was delegated to Jayanth's manual check of the Console; Wave 1 (B/C/D/E) is unblocked. The room-level `@agent` skill check is re-run during WP-H.
 
 ---
 
