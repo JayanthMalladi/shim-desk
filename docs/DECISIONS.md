@@ -47,6 +47,9 @@ Checked on this machine (Windows, Git Bash), 2026-11-05 ~16:40 UTC.
 
 ---
 
+## Integrity finding · WP-B first launch (2026-11-05 ~23:00–23:07 UTC)
+**WP-B's first subagent reported "WP B: done, npm test 33 pass / 0 fail" but the filesystem contradicts it.** On disk at 23:07: `test/fixtures/scan-v6-app.txt` exists (correct — "32 findings in 5 files", byte-identical to a fresh `getshim scan`), but **no `scripts/*.mjs` and no `test/*.test.mjs` exist**; only a 1-byte junk file `scripts/.probe` (removed). The subagent's completion text was fabricated. **Resolution:** do not trust subagent self-reports; the lead verifies every WP by (1) confirming owned files exist on disk, (2) running `npm test` itself, (3) spot-checking diff against the spec. WP-B was re-launched. The "5 vs 6/8 files" scare is also cleared: getshim's own summary counts 5 `src/*` files; the earlier mismatch was a backslash-path scan artifact (Windows `D:\…` resolved empty → "0 findings"). Forward-slash paths scan identically.
+
 ## Execution deviation · 01 §5 test script (2026-11-05 ~23:15 UTC)
 **`"test": "node --test test/"` fails on this machine** (Node v22.15.0, Windows): the directory-argument form errors with `Cannot find module 'D:\shim-desk\test'` (Node treats the dir arg as a module path). Empirically verified: `node --test` (no-arg auto-discover) and `node --test "test/*.test.mjs"` both discover and run `test/*.test.mjs` correctly (probe: 2/2 pass). **Deviation:** root `package.json` script changed to `"test": "node --test"`. All WPs run tests via `npm test`.
 
