@@ -126,8 +126,8 @@ if (IS_VITEST) {
 
   // d. Screenshots (02 §7 UI-4 d, 02 §9 "done means"): full-page, 1280x800
   //    viewport, deviceScaleFactor 2, saved to docs/board-runs.png and
-  //    docs/board-run.png. FIXTURE-BASED FOR NOW: the final screenshots should
-  //    be retaken with a real committed run after WP-H, into the same filenames.
+  //    docs/board-run.png. The runs page shows every committed run (fixture
+  //    r-0000 + real r-0001); the detail shot showcases the REAL run r-0001.
   const makeScreenshotContext = (browser: Browser): Promise<BrowserContext> =>
     browser.newContext({
       viewport: { width: 1280, height: 800 },
@@ -145,8 +145,10 @@ if (IS_VITEST) {
         fullPage: true,
       });
 
+      // Detail shot: showcase the REAL run (r-0001). Its gates are all green
+      // with regressions [], so the all-pass footer renders here too.
       const runPage = await ctx.newPage();
-      await runPage.goto('/#/run/r-0000');
+      await runPage.goto('/#/run/r-0001');
       await expect(runPage.getByText('Every gate that passed before still passes')).toBeVisible();
       await runPage.screenshot({
         path: path.join(REPO_ROOT, 'docs', 'board-run.png'),

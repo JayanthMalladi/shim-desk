@@ -11,32 +11,44 @@
     {
       "t": "2026-11-06T05:31:40.258Z",
       "kind": "status",
-      "status": "requested"
+      "status": "requested",
+      "actor": "user",
+      "text": "@shim requested: upgrade ai to v7 in JayanthMalladi/shim-demo-app"
     },
     {
       "t": "2026-11-06T06:42:27.948Z",
       "kind": "status",
-      "status": "in_review"
+      "status": "in_review",
+      "actor": "shim-lead.jayanth",
+      "text": "diff handed off to @shim-reviewer"
     },
     {
       "t": "2026-11-06T07:20:58.459Z",
       "kind": "status",
-      "status": "in_review"
+      "status": "in_review",
+      "actor": "shim-lead.jayanth",
+      "text": "diff handed off to @shim-reviewer"
     },
     {
       "t": "2026-11-06T08:03:12.555Z",
       "kind": "status",
-      "status": "blocked"
+      "status": "blocked",
+      "actor": "shim-lead.jayanth",
+      "text": "gate regressed during tsconfig widening; held, no PR opened"
     },
     {
       "t": "2026-11-06T08:23:30.186Z",
       "kind": "status",
-      "status": "in_review"
+      "status": "in_review",
+      "actor": "shim-lead.jayanth",
+      "text": "diff handed off to @shim-reviewer"
     },
     {
       "t": "2026-11-06T09:08:28.393Z",
       "kind": "status",
-      "status": "done"
+      "status": "done",
+      "actor": "shim-lead.jayanth",
+      "text": "PR opened; run logged in the ledger"
     }
   ],
   "decisions": [
