@@ -2,9 +2,9 @@
 
 **Shim Desk: upgrade a codebase through a breaking API change, in a team chat, with agents doing the work and humans making the calls.**
 
-> ⏳ PRE-STAGE: numbers, the demo GIF, and the PR link are `{{...}}` placeholders to fill after the WP-H dry run. The "How Switch is used" section, architecture, and quickstart are written.
+**Real run [r-0001](https://github.com/JayanthMalladi/shim-demo-app/pull/1):** `@shim` scanned `shim-demo-app` for the AI SDK 6→7 upgrade, found **30 findings across 7 files (18 silent)**, the humans made the 2 judgment calls (`node-22`, `telemetry-needs-otel`), Shim applied **12 deterministic fixes** and **6 files were fixed in parallel by Sonnet subagents**, every gate held, an independent `@reviewer` agent approved it, and a human opened **[PR #1](https://github.com/JayanthMalladi/shim-demo-app/pull/1)** (11 files, +244/−203). All of it is on the record in the [ledger board](#ledger-board).
 
-[**GIF / 20s clip of the room**]({{video_url_or_gif}})
+[**GIF / 20s clip of the room**](TODO: link the recorded clip — video is WP-J)
 
 ## The problem: silent breaking changes
 
@@ -73,12 +73,12 @@ Because this Windows Console build can't run agent sessions locally, the two age
 
 ## Ledger board
 
-[The board]({{pages_url}}) · ![runs](docs/board-runs.png) · ![run](docs/board-run.png)
-Read-only over `ledger/*.json`; the static build on GitHub Pages shows the committed demo run(s). *(Retake screenshots with the real run post-WP-H.)*
+[The board](https://JayanthMalladi.github.io/shim-desk/) · ![runs](docs/board-runs.png) · ![run](docs/board-run.png)
+Read-only over `ledger/*.json`; the static build on GitHub Pages shows the committed runs (`r-0000` fixture + the real `r-0001`). (URL is live once the repo's Pages source is set to GitHub Actions; the workflow is `.github/workflows/pages.yml`.)
 
 ## Built during the hackathon
 
-Built Nov 4–7, 2026 at the Flip the Switch hackathon. [Commit history]({{repo_commits_url}}). **Shim** itself (`getshim` on npm) is prior work, used unchanged.
+Built Nov 4–7, 2026 at the Flip the Switch hackathon. [Commit history](https://github.com/JayanthMalladi/shim-desk/commits/main) (first commit on/after Nov 4). **Shim** itself (`getshim` on npm) is prior work, used unchanged.
 
 ## Licence
 
