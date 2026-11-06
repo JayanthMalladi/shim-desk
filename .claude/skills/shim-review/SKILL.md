@@ -16,7 +16,7 @@ Check, in order:
 4. No test was deleted, skipped or weakened to get green.
 5. Lockfile and package.json changes match the bump (ai ^7, @ai-sdk/* majors) and nothing else.
 
-Reply in the thread with exactly one of:
-  VERDICT: approve. {one sentence}
-  VERDICT: changes. 1) {file:line, issue} 2) ...
+Reply in the thread, addressing the lead so it continues the run, with exactly one of:
+  @shim-lead.jayanth VERDICT: approve. {one sentence}
+  @shim-lead.jayanth VERDICT: changes. 1) {file:line, issue} 2) ...
 At most 5 points. If you are unsure, say what you could not verify.

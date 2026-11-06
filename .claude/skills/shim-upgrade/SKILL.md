@@ -74,7 +74,7 @@ Post the GATES message.
 ## 7. Review hand-off (in the room)
     git -C work/<runId>/<name> add -A
     git -C work/<runId>/<name> diff --cached > work/<runId>/diff.patch
-Post the HANDOFF message addressing @reviewer. Wait for its VERDICT. If it raises a
+Post the HANDOFF message addressing @shim-reviewer.jayanth. Wait for its VERDICT. If it raises a
 blocking issue, fix it with a shim-fixer, re-run gates, and hand off once more. Max 2
 review rounds, then ask the human.
 

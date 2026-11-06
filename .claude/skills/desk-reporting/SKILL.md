@@ -24,7 +24,7 @@ FANOUT:    Shim applied {autoFixed} deterministic fixes. Fixing {k} files in par
 PROGRESS:  {status emoji: done ✅ / blocked ⛔} `{file}`: {summary, max 12 words}
 GATES:     | gate | baseline | after |  (one row per gate, ✅/❌)
            {all green: "Every gate that passed before still passes." | else: what failed}
-HANDOFF:   @reviewer please review run **{runId}**: diff `work/{runId}/diff.patch`, findings `work/{runId}/findings.json`, decisions in the ledger. Reply with a verdict line.
+HANDOFF:   @shim-reviewer.jayanth please review run **{runId}**: diff `work/{runId}/diff.patch`, findings `work/{runId}/findings.json`, decisions in the ledger. Reply with a verdict line.
 APPROVAL:  Ready to open the PR on `{repo}`: {filesChanged} files, +{add}/-{del}. Reviewer: {verdict}.
            Reply **approve**, or tell me what to change.
 DONE:      PR opened: {url}. Run **{runId}** logged in the ledger.
