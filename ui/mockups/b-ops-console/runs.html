@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="page-type" content="software" />
+<meta name="site-kind" content="software" />
+<meta name="description" content="Shim Desk ledger board: a read-only ops record of Shim Desk runs - findings, human calls, fixes, gates, review, and the resulting PR." />
+<title>Shim Desk Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
+</head>
+<body>
+<div class="page" id="app">
+  <div class="header">
+    <h1>Shim Desk Ledger</h1>
+    <div class="header__meta">
+      <a class="back-link" href="run.html">Latest run</a>
+      <a class="muted" style="font-size:.85rem" href="https://github.com/JayanthMalladi/shim-desk">How this works</a>
+    </div>
+  </div>
+  <p class="muted" id="empty" hidden>No runs yet. In the ~shim-desk room, ask <span class="mono">@shim</span> to upgrade a repo.</p>
+  <div id="content" hidden>
+    <div class="stats" id="stats"></div>
+    <div id="cards"></div>
+  </div>
+</div>
+<script src="board.js"></script>
+<script>
+  // Data-driven: the runs page wraps the single fetched run in an array.
+  fetch("./r-0001.json").then((r) => r.json()).then((run) => {
+    const runs = [run];
+    const runsSorted = [...runs].sort((a, b) => (Date.parse(b.createdAt) || 0) - (Date.parse(a.createdAt) || 0));
+    const num = (v) => (typeof v === "number" ? v : 0);
+    const stats = [
+      { label: "Runs", value: runsSorted.length },
+      { label: "PRs opened", value: runsSorted.filter((r) => r.status === "done" && r.pr?.url).length },
+      { label: "Human decisions", value: runsSorted.reduce((a, r) => a + (r.decisions?.length ?? 0), 0) },
+      { label: "Silent breaks caught", value: runsSorted.reduce((a, r) => a + num(r.findings?.bySeverity?.silent), 0) },
+    ];
+    document.getElementById("stats").innerHTML = stats
+      .map((s) => `<div class="stat"><div class="v">${s.value}</div><div class="l">${B.esc(s.label)}</div></div>`)
+      .join("");
+    document.getElementById("cards").innerHTML = runsSorted.map(B.runCard).join("");
+    document.getElementById("empty").hidden = runsSorted.length > 0;
+    document.getElementById("content").hidden = false;
+  }).catch((e) => {
+    const el = document.createElement("p");
+    el.className = "muted";
+    el.textContent = "Can't read the ledger: " + e.message;
+    document.getElementById("app").appendChild(el);
+  });
+</script>
+</body>
+</html>

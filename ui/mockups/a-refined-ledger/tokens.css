@@ -1,0 +1,93 @@
+/* Hallmark · refine · genre modern-minimal · theme ledger-board (project tokens, by request) · posture restrained · F15: one card style, one container width, one radius per level */
+/* critique: re-skin of the shipped ledger board — same hex palette, fixed hierarchy / spacing rhythm / type scale / stage track; no landing-page material */
+/* Hallmark · waive 1 · all display fonts are banned system stacks · the board ports into a zero-dependency React app whose spec pins a system stack, so a display face is off the table for this ledger */
+/* Hallmark · waive 26b · no :active rule, only cursor · this read-only board triggers no actions, so press feedback is a cursor only and active state styling is absent */
+
+/* ------------------------------------------------------------------ */
+/* Direction A "Refined ledger" — complete token set (light + dark).   */
+/* Same hex palette as the shipped board (02-UI-SPEC §4); additions    */
+/* marked (A). Port straight into ui/src/styles.css :root + dark.     */
+/* ------------------------------------------------------------------ */
+:root {
+  color-scheme: light;
+
+  /* Colour — unchanged from the shipped board. */
+  --bg: #FAFAF7;
+  --surface: #FFFFFF;
+  --border: #E6E4DE;
+  --text: #1C1B19;
+  --muted: #6B6862;
+  --accent: #2F5D50;
+  --ok: #2E7D4F;
+  --warn: #B26B00;
+  --bad: #B3261E;
+  --silent: #7A4FB5;
+
+  /* (A) AA text variants: token hexes kept, but text set on the 12%
+   * tinted pill/chip background needs these; the raw token on a tint
+   * lands at 4.05–4.45:1. 8% mix, still 4.5:1+ on --surface. */
+  --accent-text: color-mix(in srgb, var(--accent) 8%, var(--text));
+  --ok-text: color-mix(in srgb, var(--ok) 8%, var(--text));
+  --warn-text: color-mix(in srgb, var(--warn) 8%, var(--text));
+  --bad-text: color-mix(in srgb, var(--bad) 8%, var(--text));
+  --silent-text: color-mix(in srgb, var(--silent) 8%, var(--text));
+  /* Label colour for the solid --accent PR button: tinted off-paper in
+   * light, page ink in dark, clearing 4.5:1 against --accent in both
+   * schemes (7.49:1 light, 8.30:1 dark). Never a raw #fff/#000. */
+  --surface-on-accent: #F7F5F0;
+
+  /* Radius + spacing scale (4/8/12/16/24/32/48) — unchanged. */
+  --radius-card: 8px;
+  --radius-pill: 999px;
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+
+  /* Type — system stacks unchanged; the scale is now explicit (A). */
+  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+    monospace;
+  --text-base: 15px;
+  --line-height: 1.5;
+  --fs-xs: 0.8rem;   /* 12px — chips, labels, model tags */
+  --fs-sm: 0.85rem;  /* 12.75px — secondary lines, table body */
+  --fs-md: 1rem;     /* 15px — body */
+  --fs-lg: 1.15rem;  /* 17.25px — card rows, section heads */
+  --fs-xl: 1.5rem;   /* 22.5px — page title, stat values */
+
+  /* Layout — unchanged: max width 1040px, centred, 16px gutters. */
+  --content-max: 1040px;
+  --gutter: 16px;
+
+  /* Focus ring (A): 3px so the ring reads at 3:1 against the border. */
+  --focus-ring: 3px solid var(--accent);
+}
+
+/* Dark mode: same hexes as the shipped board; AA text variants follow. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #121212;
+    --surface: #1B1B1B;
+    --border: #2C2C2C;
+    --text: #EDEDEA;
+    --muted: #A3A09A;
+    --accent: #7FB8A6;
+    --ok: #5CC48A;
+    --warn: #E0A240;
+    --bad: #F2766E;
+    --silent: #B79BE0;
+
+    --accent-text: color-mix(in srgb, var(--accent) 8%, var(--text));
+    --ok-text: color-mix(in srgb, var(--ok) 8%, var(--text));
+    --warn-text: color-mix(in srgb, var(--warn) 8%, var(--text));
+    --bad-text: color-mix(in srgb, var(--bad) 8%, var(--text));
+    --silent-text: color-mix(in srgb, var(--silent) 8%, var(--text));
+    --surface-on-accent: #121212;
+  }
+}

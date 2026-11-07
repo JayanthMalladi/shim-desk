@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="page-type" content="software" />
+<meta name="site-kind" content="software" />
+<meta name="description" content="Shim Desk ledger board: a read-only ops record of Shim Desk runs - findings, human calls, fixes, gates, review, and the resulting PR." />
+<title>Run · Shim Desk Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
+</head>
+<body>
+<div class="page" id="app">
+  <a class="back-link" href="runs.html">← All runs</a>
+
+  <div class="header" id="title-row"></div>
+
+  <div id="stop-banner" hidden></div>
+
+  <section class="card" id="stage-card" style="margin-top:16px"></section>
+
+  <div class="grid-2" id="grid" style="margin-top:16px"></div>
+
+  <div id="rest"></div>
+</div>
+<script src="board.js"></script>
+<script>
+  fetch("./r-0001.json").then((r) => r.json()).then((run) => {
+    const B2 = window.B;
+    // 1 · title row: runId · repo (linked) · pill · requested-by
+    document.getElementById("title-row").innerHTML = `
+      <h1><span class="mono" style="font-weight:600">${B2.esc(run.runId)}</span> ·
+        <a href="https://github.com/${B2.esc(run.repo)}" target="_blank" rel="noreferrer" style="font-weight:600">${B2.esc(run.repo)}</a></h1>
+      <div class="header__meta">
+        ${B2.pill(run.status, run.events)}
+        <span class="muted" style="font-size:.85rem">requested by ${B2.esc(run.requestedBy)} · ${B2.absTime(run.createdAt)}</span>
+      </div>`;
+
+    // blocked / failed banner
+    const stopped = run.status === "blocked" || run.status === "failed";
+    if (stopped) {
+      const b = document.getElementById("stop-banner");
+      b.hidden = false;
+      b.innerHTML = `<div class="card" role="alert" style="border-left:3px solid var(--bad)">
+        <strong>${B2.esc(run.status === "blocked" ? "Run blocked" : "Run failed")}</strong>
+        ${run.statusReason ? `<div>${B2.esc(run.statusReason)}</div>` : ""}</div>`;
+    }
+
+    // 2 · full stage track
+    document.getElementById("stage-card").innerHTML =
+      `<div class="section__head"><h2>Stages</h3></div>${B2.rail(run.status, run.events, false)}`;
+
+    // 3 · two-column grid: findings (left), decisions (right)
+    document.getElementById("grid").innerHTML =
+      `<div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        ${B2.findingsSummary(run.findings)}${B2.findingsTable(run.findings)}
+      </div>
+      <div style="min-width:0">${B2.decisionList(run.decisions)}</div>`;
+
+    // 4–8 · the rest
+    document.getElementById("rest").innerHTML =
+      B2.fixGrid(run) + B2.gatesTable(run.gates) + B2.reviewCard(run.review) +
+      B2.prCard(run) + B2.timeline(run.events);
+  }).catch((e) => {
+    const el = document.createElement("p");
+    el.className = "muted";
+    el.textContent = "Can't read this run: " + e.message;
+    document.getElementById("app").appendChild(el);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="paper-logbook">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shim Desk Ledger: Runs</title>
+  <meta name="description" content="Shim Desk Ledger board: a read-only paper logbook of every shim upgrade run, from the human request to the opened pull request." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="tokens.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="page">
+    <div class="spine" aria-hidden="true"></div>
+    <header class="page-head">
+      <h1 class="page-head__title">Shim Desk Ledger</h1>
+      <div class="page-head__meta">
+        <span class="muted">read-only</span>
+        <a href="run.html" class="muted">open a run</a>
+      </div>
+    </header>
+
+    <div id="stats" class="stats"></div>
+    <div id="alert-slot"></div>
+    <div id="cards"></div>
+  </main>
+
+  <script src="board.js"></script>
+  <script>
+    (function () {
+      "use strict";
+      var B = window.Board;
+      var $stats = document.getElementById("stats");
+      var $alert = document.getElementById("alert-slot");
+      var $cards = document.getElementById("cards");
+
+      function pill(status) {
+        var color = B.pillColor(status);
+        return (
+          '<span class="status-pill ' + color + '"><span class="dot" aria-hidden="true"></span>' +
+          B.pillText(status) +
+          "</span>"
+        );
+      }
+
+      function track(status, events, compact) {
+        var states = B.stageStates(status, events);
+        var stamps = B.stageTimestamps(events);
+        var items = "";
+        for (var i = 0; i < B.STAGE_COUNT; i++) {
+          var timeLabel = stamps[i] ? B.absTime(stamps[i]) : "";
+          var title = timeLabel ? B.STAGE_LABELS[i] + " — " + timeLabel : B.STAGE_LABELS[i];
+          items +=
+            '<span class="stage-track__item" data-state="' + states[i] + '" title="' + B.esc(title) +
+            '" tabindex="0" role="img" aria-label="' + B.esc(B.STAGE_LABELS[i] + " " + states[i]) + '">' +
+            '<span class="stage-track__marker" aria-hidden="true"></span>' +
+            '<span class="stage-track__label">' + B.STAGE_LABELS[i] + "</span></span>";
+        }
+        return '<div class="stage-track' + (compact ? " compact" : "") + '" role="group" aria-label="stage progress">' + items + "</div>";
+      }
+
+      function statsFor(runs) {
+        var prs = 0,
+          decisions = 0,
+          silent = 0;
+        runs.forEach(function (r) {
+          if (r.status === "done" && r.pr && r.pr.url) prs += 1;
+          decisions += r.decisions ? r.decisions.length : 0;
+          silent += B.num(r.findings && r.findings.bySeverity && r.findings.bySeverity.silent);
+        });
+        return [
+          { label: "Runs", value: runs.length },
+          { label: "PRs opened", value: prs },
+          { label: "Human decisions", value: decisions },
+          { label: "Silent breaks caught", value: silent },
+        ];
+      }
+
+      function renderStats(list) {
+        var s = statsFor(list);
+        $stats.innerHTML = s
+          .map(function (tile) {
+            return '<div class="stat"><div class="stat__value">' + tile.value + '</div><div class="stat__label">' + tile.label + "</div></div>";
+          })
+          .join("");
+      }
+
+      function renderCard(r) {
+        var total = B.num(r.findings && r.findings.total);
+        var silentN = B.num(r.findings && r.findings.bySeverity && r.findings.bySeverity.silent);
+        var decisionsN = r.decisions ? r.decisions.length : 0;
+        var gates = B.gateStats(r);
+        var prUrl = r.pr && r.pr.url;
+
+        var html =
+          '<article class="run-card" aria-label="run ' + B.esc(r.runId) + '">' +
+          '<a class="run-card__link" href="run.html#/' + B.esc(r.runId) + '" aria-label="Open run ' + B.esc(r.runId) + '"></a>' +
+          '<div class="run-card__body' + (prUrl ? " has-pr" : "") + '">' +
+          '<div class="run-card__line"><span class="run-card__id mono">' + B.esc(r.runId) + "</span>" +
+          "<span>" + B.esc(r.repo) + "</span>" +
+          '<span class="muted">' + B.esc(B.relTime(r.createdAt)) + "</span>" +
+          pill(r.status) + "</div>" +
+          track(r.status, r.events, true) +
+          '<div class="run-card__chips">' +
+          '<span class="chip">' + total + " findings</span>" +
+          '<span class="chip silent">' + silentN + " silent</span>" +
+          '<span class="chip">' + decisionsN + " decisions</span>" +
+          '<span class="chip">gates ' + gates.green + "/" + gates.total + "</span>" +
+          "</div>" +
+          "</div>" +
+          (prUrl
+            ? '<a class="run-card__pr" href="' + B.esc(prUrl) + '" target="_blank" rel="noreferrer">PR: ' + B.esc(prUrl) + "</a>"
+            : "") +
+          "</article>";
+        return html;
+      }
+
+      fetch("./r-0001.json")
+        .then(function (res) {
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return res.json();
+        })
+        .then(function (run) {
+          // Runs page treats the board as a list; a single committed run
+          // becomes a one-element array (newest-first sort is a no-op here).
+          var runs = [run];
+          renderStats(runs);
+          $cards.innerHTML = runs.map(renderCard).join("");
+        })
+        .catch(function (err) {
+          $alert.innerHTML = '<div class="alert" role="alert">Can&rsquo;t read the ledger folder: <span class="muted">' + B.esc(err && err.message ? err.message : String(err)) + "</span></div>";
+        });
+    })();
+  </script>
+</body>
+</html>

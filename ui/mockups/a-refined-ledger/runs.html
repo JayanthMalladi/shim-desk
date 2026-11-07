@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" data-type="software" data-radius="sharp" data-motion="quiet">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="page-type" content="software" />
+  <meta name="site-kind" content="software" />
+  <meta name="page-kind" content="dashboard" />
+  <meta
+    name="description"
+    content="Shim Desk Ledger runs board: a read-only status view of every shim upgrade run, its gates, human decisions, and the pull request it opened."
+  />
+  <title>Shim Desk Ledger · runs</title>
+  <link rel="stylesheet" href="tokens.css" />
+  <link rel="stylesheet" href="board.css" />
+</head>
+<body>
+  <div id="app"></div>
+  <script src="render.js"></script>
+  <script>
+    (async function () {
+      const root = document.getElementById("app");
+      try {
+        // Static mockup: fetch the one real run, wrap in an array like
+        // GET /api/runs would return.
+        const r = await loadRun("r-0001.json");
+        renderRuns([r], root);
+      } catch (err) {
+        root.innerHTML =
+          '<div class="page"><div class="card"><strong>Can\'t read the ledger folder</strong> <span class="muted">' +
+          String(err).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])) +
+          "</span></div></div>";
+      }
+    })();
+  </script>
+</body>
+</html>

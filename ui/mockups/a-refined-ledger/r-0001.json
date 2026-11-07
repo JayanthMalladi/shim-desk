@@ -1,0 +1,442 @@
+{
+  "runId": "r-0001",
+  "repo": "JayanthMalladi/shim-demo-app",
+  "migration": "ai-sdk-v7",
+  "requestedBy": "user",
+  "room": "shim-desk",
+  "createdAt": "2026-11-06T05:31:40.258Z",
+  "updatedAt": "2026-11-06T09:08:53.429Z",
+  "status": "done",
+  "events": [
+    {
+      "t": "2026-11-06T05:31:40.258Z",
+      "kind": "status",
+      "status": "requested",
+      "actor": "user",
+      "text": "@shim requested: upgrade ai to v7 in JayanthMalladi/shim-demo-app"
+    },
+    {
+      "t": "2026-11-06T06:42:27.948Z",
+      "kind": "status",
+      "status": "in_review",
+      "actor": "shim-lead.jayanth",
+      "text": "diff handed off to @shim-reviewer"
+    },
+    {
+      "t": "2026-11-06T07:20:58.459Z",
+      "kind": "status",
+      "status": "in_review",
+      "actor": "shim-lead.jayanth",
+      "text": "diff handed off to @shim-reviewer"
+    },
+    {
+      "t": "2026-11-06T08:03:12.555Z",
+      "kind": "status",
+      "status": "blocked",
+      "actor": "shim-lead.jayanth",
+      "text": "gate regressed during tsconfig widening; held, no PR opened"
+    },
+    {
+      "t": "2026-11-06T08:23:30.186Z",
+      "kind": "status",
+      "status": "in_review",
+      "actor": "shim-lead.jayanth",
+      "text": "diff handed off to @shim-reviewer"
+    },
+    {
+      "t": "2026-11-06T09:08:28.393Z",
+      "kind": "status",
+      "status": "done",
+      "actor": "shim-lead.jayanth",
+      "text": "PR opened; run logged in the ledger"
+    }
+  ],
+  "decisions": [
+    {
+      "ruleId": "node-22",
+      "question": "",
+      "options": [],
+      "choice": 1,
+      "by": "user",
+      "at": "2026-11-06T05:34:09.773Z"
+    },
+    {
+      "ruleId": "telemetry-needs-otel",
+      "question": "",
+      "options": [],
+      "choice": 1,
+      "by": "user",
+      "at": "2026-11-06T05:37:20.855Z"
+    }
+  ],
+  "gates": {
+    "baseline": {
+      "install": true,
+      "typecheck .": true,
+      "test .": true
+    },
+    "after": {
+      "install": true,
+      "build": true,
+      "typecheck .": true,
+      "test .": true
+    },
+    "regressions": [],
+    "detail": {
+      "install": {
+        "ok": true,
+        "code": 0,
+        "ms": 2943,
+        "tail": "\nup to date, audited 67 packages in 2s\n\n16 packages are looking for funding\n  run `npm fund` for details\n\n3 vulnerabilities (1 moderate, 2 critical)\n\nTo address all issues (including breaking changes), run:\n  npm audit fix --force\n\nRun `npm audit` for details.\n"
+      },
+      "build": {
+        "ok": true,
+        "code": null,
+        "ms": 0,
+        "tail": "skipped"
+      },
+      "typecheck .": {
+        "ok": true,
+        "code": 0,
+        "ms": 2094,
+        "tail": "\n> shim-demo-app@0.1.0 typecheck\n> tsc --noEmit\n\n"
+      },
+      "test .": {
+        "ok": true,
+        "code": 0,
+        "ms": 1977,
+        "tail": "\n> shim-demo-app@0.1.0 test\n> vitest run\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mD:/shim-desk/work/r-0001/shim-demo-app\u001b[39m\n\n \u001b[32m✓\u001b[39m tests/billing.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 9\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m   Start at \u001b[22m 12:11:44\n\u001b[2m   Duration \u001b[22m 1.06s\u001b[2m (transform 91ms, setup 0ms, collect 165ms, tests 9ms, environment 0ms, prepare 379ms)\u001b[22m\n\n"
+      }
+    }
+  },
+  "review": {
+    "by": "shim-reviewer.jayanth",
+    "verdict": "approve",
+    "rounds": 3,
+    "notes": [
+      "allowSystemInMessages retained at 4 sites (agent.ts:46, agent.ts:53, messages.ts:38, messages.ts:42); 6 untraced sites reverted",
+      "P4 (tsconfig widening + import-smoke for tools.js) parked as a PR-body follow-up"
+    ]
+  },
+  "pr": {
+    "url": "https://github.com/JayanthMalladi/shim-demo-app/pull/1",
+    "branch": "shim/ai-sdk-7-r-0001",
+    "filesChanged": 11,
+    "additions": 244,
+    "deletions": 203
+  },
+  "findings": {
+    "source": "scan",
+    "total": 30,
+    "files": 7,
+    "bySeverity": {
+      "break": 11,
+      "silent": 18,
+      "deprecated": 1
+    },
+    "byFix": {
+      "auto": 12,
+      "agent": 16,
+      "manual": 2
+    },
+    "items": [
+      {
+        "file": "package.json",
+        "line": 1,
+        "severity": "break",
+        "fix": "manual",
+        "ruleId": "node-22",
+        "message": "AI SDK 7 requires Node.js 22 or later."
+      },
+      {
+        "file": "src/agent.ts",
+        "line": 14,
+        "severity": "silent",
+        "fix": "auto",
+        "ruleId": "multi-step-end-event",
+        "message": "`event.usage` in onFinish now covers every step. `event.finalStep.usage` keeps the v6 value."
+      },
+      {
+        "file": "src/agent.ts",
+        "line": 17,
+        "severity": "silent",
+        "fix": "auto",
+        "ruleId": "multi-step-result",
+        "message": "`result.usage` now covers every step, not just the last one. `result.finalStep.usage` keeps the v6 value."
+      },
+      {
+        "file": "src/agent.ts",
+        "line": 18,
+        "severity": "silent",
+        "fix": "auto",
+        "ruleId": "multi-step-result",
+        "message": "`result.toolCalls` now covers every step, not just the last one. `result.finalStep.toolCalls` keeps the v6 value."
+      },
+      {
+        "file": "src/agent.ts",
+        "line": 19,
+        "severity": "silent",
+        "fix": "auto",
+        "ruleId": "response-messages",
+        "message": "`response.messages` now holds only the final step's messages. Use `responseMessages` for the full history."
+      },
+      {
+        "file": "src/agent.ts",
+        "line": 20,
+        "severity": "deprecated",
+        "fix": "auto",
+        "ruleId": "total-usage",
+        "message": "`totalUsage` is deprecated; `usage` now covers all steps."
+      },
+      {
+        "file": "src/agent.ts",
+        "line": 31,
+        "severity": "silent",
+        "fix": "agent",
+        "ruleId": "multi-step-result",
+        "message": "`usage` now covers every step, not just the last one. Read it from `finalStep` to keep the v6 value."
+      },
+      {
+        "file": "src/agent.ts",
+        "line": 39,
+        "severity": "silent",
+        "fix": "manual",
+        "ruleId": "telemetry-needs-otel",
+        "message": "OpenTelemetry moved to @ai-sdk/otel. Without `registerTelemetry(new OpenTelemetry())` at startup, traces stop being emitted with no error. Install @ai-sdk/otel and register it once."
+      },
+      {
+        "file": "src/agent.ts",
+        "line": 41,
+        "severity": "break",
+        "fix": "auto",
+        "ruleId": "system-in-messages",
+        "message": "`messages`/`prompt` has a system message, which AI SDK 7 rejects at runtime by default. `allowSystemInMessages: true` keeps the v6 behavior."
+      },
+      {
+        "file": "src/agent.ts",
+        "line": 45,
+        "severity": "silent",
+        "fix": "agent",
+        "ruleId": "multi-step-result",
+        "message": "`result.toolCalls` now covers every step, not just the last one. `result.finalStep.toolCalls` keeps the v6 value."
+      },
+      {
+        "file": "src/agent.ts",
+        "line": 50,
+        "severity": "silent",
+        "fix": "agent",
+        "ruleId": "maybe-system-in-messages",
+        "message": "This call's options are built elsewhere. If `messages`/`prompt` can hold a system message, AI SDK 7 rejects it at runtime: set `allowSystemInMessages: true` in the options (keeps the v6 behavior), or move it to `instructions`."
+      },
+      {
+        "file": "src/agent.ts",
+        "line": 51,
+        "severity": "silent",
+        "fix": "agent",
+        "ruleId": "maybe-multi-step-result",
+        "message": "This call's options are built elsewhere; if they set stopWhen, `result.toolCalls` now covers every step, not just the last one. `result.finalStep.toolCalls` keeps the v6 value."
+      },
+      {
+        "file": "src/billing.ts",
+        "line": 10,
+        "severity": "silent",
+        "fix": "agent",
+        "ruleId": "typed-multi-step-result",
+        "message": "`result.usage` is declared as an AI SDK result. If the call that produced it runs several steps, `usage` now covers every step. Read `finalStep.usage` to keep the v6 value."
+      },
+      {
+        "file": "src/legacy.cjs",
+        "line": 1,
+        "severity": "break",
+        "fix": "agent",
+        "ruleId": "esm-only",
+        "message": "AI SDK 7 is ESM-only; require('ai') throws. Convert this module to ESM imports."
+      },
+      {
+        "file": "src/messages.ts",
+        "line": 11,
+        "severity": "break",
+        "fix": "auto",
+        "ruleId": "system-in-messages",
+        "message": "`messages`/`prompt` is built elsewhere and may hold a system message, which AI SDK 7 rejects at runtime by default. `allowSystemInMessages: true` keeps the v6 behavior."
+      },
+      {
+        "file": "src/messages.ts",
+        "line": 17,
+        "severity": "break",
+        "fix": "auto",
+        "ruleId": "system-in-messages",
+        "message": "`messages`/`prompt` is built elsewhere and may hold a system message, which AI SDK 7 rejects at runtime by default. `allowSystemInMessages: true` keeps the v6 behavior."
+      },
+      {
+        "file": "src/messages.ts",
+        "line": 22,
+        "severity": "break",
+        "fix": "auto",
+        "ruleId": "system-in-messages",
+        "message": "`messages`/`prompt` is built elsewhere and may hold a system message, which AI SDK 7 rejects at runtime by default. `allowSystemInMessages: true` keeps the v6 behavior."
+      },
+      {
+        "file": "src/messages.ts",
+        "line": 26,
+        "severity": "break",
+        "fix": "auto",
+        "ruleId": "system-in-messages",
+        "message": "`messages`/`prompt` is built elsewhere and may hold a system message, which AI SDK 7 rejects at runtime by default. `allowSystemInMessages: true` keeps the v6 behavior."
+      },
+      {
+        "file": "src/messages.ts",
+        "line": 42,
+        "severity": "silent",
+        "fix": "agent",
+        "ruleId": "maybe-system-in-messages",
+        "message": "This call's options are built elsewhere. If `messages`/`prompt` can hold a system message, AI SDK 7 rejects it at runtime: set `allowSystemInMessages: true` in the options (keeps the v6 behavior), or move it to `instructions`."
+      },
+      {
+        "file": "src/messages.ts",
+        "line": 46,
+        "severity": "break",
+        "fix": "auto",
+        "ruleId": "system-in-messages",
+        "message": "This agent may be called with a system message in `messages`/`prompt` (or its calls aren't visible here), which AI SDK 7 rejects by default. Only the constructor accepts the option; `.generate()`/`.stream()` don't. `allowSystemInMessages: true` keeps the v6 behavior."
+      },
+      {
+        "file": "src/messages.ts",
+        "line": 55,
+        "severity": "break",
+        "fix": "auto",
+        "ruleId": "system-in-messages",
+        "message": "This agent may be called with a system message in `messages`/`prompt` (or its calls aren't visible here), which AI SDK 7 rejects by default. Only the constructor accepts the option; `.generate()`/`.stream()` don't. `allowSystemInMessages: true` keeps the v6 behavior."
+      },
+      {
+        "file": "src/tools.ts",
+        "line": 13,
+        "severity": "break",
+        "fix": "agent",
+        "ruleId": "tool-execution-context",
+        "message": "AI SDK 7's `ToolExecutionOptions` now has a required `context` field; this literal is missing it. Add a `context` property matching the tool's `contextSchema` (or `{}` when the tool defines none) so the call type-checks. In a test this is a minimal type-only edit."
+      },
+      {
+        "file": "src/tools.ts",
+        "line": 22,
+        "severity": "break",
+        "fix": "agent",
+        "ruleId": "tool-execution-context",
+        "message": "AI SDK 7's `ToolExecutionOptions` now has a required `context` field; this literal is missing it. Add a `context` property matching the tool's `contextSchema` (or `{}` when the tool defines none) so the call type-checks. In a test this is a minimal type-only edit."
+      },
+      {
+        "file": "src/typed.ts",
+        "line": 14,
+        "severity": "silent",
+        "fix": "agent",
+        "ruleId": "typed-multi-step-result",
+        "message": "`result.response.messages` is declared as an AI SDK result. If the call that produced it runs several steps, `response.messages` now holds only the final step's messages. Use `responseMessages` for the full history."
+      },
+      {
+        "file": "src/typed.ts",
+        "line": 15,
+        "severity": "silent",
+        "fix": "agent",
+        "ruleId": "typed-multi-step-result",
+        "message": "`result.usage` is declared as an AI SDK result. If the call that produced it runs several steps, `usage` now covers every step. Read `finalStep.usage` to keep the v6 value."
+      },
+      {
+        "file": "src/typed.ts",
+        "line": 16,
+        "severity": "silent",
+        "fix": "agent",
+        "ruleId": "typed-multi-step-result",
+        "message": "`result.warnings` is declared as an AI SDK result. If the call that produced it runs several steps, `warnings` now covers every step. Read `finalStep.warnings` to keep the v6 value."
+      },
+      {
+        "file": "src/typed.ts",
+        "line": 20,
+        "severity": "silent",
+        "fix": "agent",
+        "ruleId": "typed-multi-step-result",
+        "message": "`result` is declared as an AI SDK result. If the call that produced it runs several steps, `toolCalls` now covers every step. Read `finalStep.toolCalls` to keep the v6 value."
+      },
+      {
+        "file": "src/typed.ts",
+        "line": 21,
+        "severity": "silent",
+        "fix": "agent",
+        "ruleId": "typed-multi-step-result",
+        "message": "`other?.sources` is declared as an AI SDK result. If the call that produced it runs several steps, `sources` now covers every step. Read `finalStep.sources` to keep the v6 value."
+      },
+      {
+        "file": "src/typed.ts",
+        "line": 44,
+        "severity": "silent",
+        "fix": "agent",
+        "ruleId": "typed-multi-step-result",
+        "message": "`this.last?.files` is declared as an AI SDK result. If the call that produced it runs several steps, `files` now covers every step. Read `finalStep.files` to keep the v6 value."
+      },
+      {
+        "file": "src/typed.ts",
+        "line": 51,
+        "severity": "silent",
+        "fix": "agent",
+        "ruleId": "multi-step-result",
+        "message": "`result.toolCalls` now covers every step, not just the last one. `result.finalStep.toolCalls` keeps the v6 value."
+      }
+    ],
+    "top": {
+      "file": "src/agent.ts",
+      "line": 17,
+      "severity": "silent",
+      "fix": "auto",
+      "ruleId": "multi-step-result",
+      "message": "`result.usage` now covers every step, not just the last one. `result.finalStep.usage` keeps the v6 value."
+    }
+  },
+  "autoFixed": 12,
+  "fixes": [
+    {
+      "file": "src/typed.ts",
+      "status": "done",
+      "summary": "Switched all result reads to finalStep.* to keep v6 last-step semantics",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "file": "src/billing.ts",
+      "status": "done",
+      "summary": "Read result.finalStep.usage to keep v6 single-step billing",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "file": "src/messages.ts",
+      "status": "done",
+      "summary": "allowSystemInMessages:true at viaSpread (the authorized finding)",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "file": "src/legacy.cjs",
+      "status": "done",
+      "summary": "Converted to ESM (legacy.mjs, import from ai)",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "file": "src/agent.ts",
+      "status": "done",
+      "summary": "finalStep reads, allowSystemInMessages, otel telemetry registered; typecheck passes",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "file": "src/tools.ts",
+      "status": "done",
+      "summary": "Added the required context field to both tool-call option literals (type-only)",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "approval": {
+    "by": "user",
+    "at": "2026-11-06T09:08:20.000Z"
+  }
+}

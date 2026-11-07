@@ -1,0 +1,13 @@
+Direction A "Refined ledger": same hex palette + layout as today's board; I only fixed hierarchy, spacing rhythm, type scale, table density and the stage track (connectors), so a returning viewer is not transported.
+Skill rules: hallmark Floor (tokens only, no `transition:all`, focus-visible, overflow-x:clip, reduced-motion, no landing-page material) → base.css choices; taste-skill (one system, plain copy, equal edges, quiet micro-interactions) → single `.card` family, stat tiles, 2px card lift; ui-ux-pro-max dashboard patterns (stat strip, scroll-wrapped tables, status text+color) → summary strip, gates/fix tiles.
+Type scale (A): fs 12/12.75/15/17.25/22.5px (--fs-xs…--fs-xl); headings h1 22.5px 700, h3 17.25px 600. Spacing: unchanged 4/8/12/16/24/32/48 (--s1…--s7).
+Section changes vs today: runs page = header, 4-stat strip, run cards (identical order). run page = sticky back-link, title row (runId+repo+pill+meta), full 9-stage track, findings/decisions two-col grid, fix grid, gates, review, PR, timeline (identical order). Refinements: explicit type scale, stat tiles with big numerals + tabular-nums, stage-track hairline connectors, tighter table density, PR-button label tinted for AA in both schemes.
+Component (not just CSS) work when porting: move render.js's status→stage + pill maps into format.ts (already there — zero change); stage-track connectors and the 4%-tint pill backgrounds are pure CSS; PR-button `--surface-on-accent` token + reduced-motion + overflow-x:clip are CSS-only. Nothing needs a new component.
+Self-check (all PASS):
+- AA contrast: PASS — 3 lowest ratios 5.05:1 (light gates-pass --ok on surface), 5.34:1 (light top-finding --silent on 6% tint), 5.55:1 (light muted on surface); all 22 pairs ≥4.5 (contrast-check.cjs).
+- No horizontal scroll at 375px: PASS — scrollWidth==clientWidth==375 on both pages; stage track + tables scroll inside their own containers.
+- Keyboard focus visible: PASS — 3px solid accent outline on a/button/[tabindex] :focus-visible.
+- Every status shown as text + colour: PASS — pill always carries the label; gates cells say pass/fail; fix tiles say done/blocked.
+- Hallmark sloplint (--scope page, static): 0 FAIL, 3 WARN, 1 WAIVED across 4 files. WARN = gate-3 "3px side stripe" on regression row / fix-tile / banner — spec §5.2 mandates the `--bad`/`--ok` left border, so kept. --render tier not run (no puppeteer-core for the script; screenshots taken via playwright-core instead).
+- No landing-page elements: PASS — no hero/CTA/pricing/photos; read-only, links only.
+- All numbers match r-0001.json: PASS — 1 run, 1 PR, 2 decisions, 18 silent; 30 findings (11/18/1); gates 4/4; +244/−203; timeline 6 events.

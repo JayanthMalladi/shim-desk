@@ -1,0 +1,100 @@
+/* Hallmark v2.0.0 · theme: custom (getshim.dev brand, paper logbook) · scope: mockup pages (runs.html, run.html) · genre: modern-minimal · critique: paper ledger, ruled lines, yellow reserved for marks never text — every colour through a token */
+
+/* ------------------------------------------------------------------ */
+/* Design tokens — light (default)                                     */
+/* Paper logbook in the getshim.dev brand: warm paper, ink, one        */
+/* yellow. Yellow is a large-mark colour only; any yellow that reads  */
+/* as text uses --text-yellow (AA-proven on paper, see NOTES.md).     */
+/* ------------------------------------------------------------------ */
+:root {
+  color-scheme: light;
+
+  /* paper + ink */
+  --bg: #f6f1e7;
+  --surface: #fffdf8;
+  --border: #e3dcc9;
+  --border-strong: #d2c8ae;
+  --rule: #ece5d3; /* logbook ruling lines */
+
+  /* ink */
+  --text: #2a2620;
+  --muted: #5f594d;
+
+  /* brand marks — yellow lives on surfaces/marks, never as text */
+  --accent: #FFD84D;         /* brand yellow — large marks/surfaces only, never text */
+  --accent-soft: #f9f0d2;    /* pale yellow surface wash (non-text) */
+  --text-yellow: #8a5800;     /* the one yellow allowed to be text (AA) */
+
+  /* status roles */
+  --ok: #2e7d4f;
+  --warn: #9a5f00; /* deepened from the spec's #b26b00 (4.13:1) to hold AA on paper */
+  --bad: #b3261e;
+  --silent: #7a4fb5;
+
+  /* status tints (pill / alert / finding washes, non-text) */
+  --ok-tint: color-mix(in srgb, var(--ok) 8%, var(--surface));
+  --warn-tint: color-mix(in srgb, var(--warn) 8%, var(--surface));
+  --bad-tint: color-mix(in srgb, var(--bad) 8%, var(--surface));
+  --silent-tint: color-mix(in srgb, var(--silent) 8%, var(--surface));
+  --muted-tint: color-mix(in srgb, var(--muted) 8%, var(--surface));
+
+  /* radius */
+  --radius-card: 8px;
+  --radius-pill: 999px;
+
+  /* spacing scale 4/8/12/16/24/32/48 */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+
+  /* type: Bricolage Grotesque (headings, Google Fonts link) + system body */
+  --font-head: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --text-base: 15px;
+  --line-height: 1.5;
+
+  /* type scale (rem at 15px base) */
+  --t-display: 2.25rem; /* 34px page title */
+  --t-h2: 1.15rem;      /* section headings */
+  --t-stat: 2.5rem;    /* stat figures */
+  --t-body: 1rem;
+  --t-small: 0.9rem;
+  --t-caption: 0.8rem;
+
+  /* layout: mirror the board — 1040px column, 16px gutter */
+  --content-max: 1040px;
+  --gutter: 16px;
+
+  --focus-ring: 2px solid var(--text-yellow);
+}
+
+/* Dark mode: warm charcoal paper, same roles. Non-text marks keep the     */
+/* brand yellow; text-yellow darkens to stay readable on dark surfaces.    */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --bg: #16140f;
+    --surface: #1e1b15;
+    --border: #37332a;
+    --border-strong: #48433a;
+    --rule: #2a2720;
+
+    --text: #efe9dc;
+    --muted: #a99e8a;
+
+    --accent: #FFD84D; /* brand yellow as a mark survives on charcoal */
+    --accent-soft: #2b2617;
+    --text-yellow: #d9a81f;
+
+    --ok: #5cc48a;
+    --warn: #e0a240;
+    --bad: #f2766e;
+    --silent: #b79be0;
+  }
+}

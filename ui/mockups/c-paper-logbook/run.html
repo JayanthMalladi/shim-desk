@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="paper-logbook">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shim Desk Ledger: Run</title>
+  <meta name="description" content="One shim upgrade run as a signed logbook page: the stage track, findings, human calls, subagent fixes, gates, review and the opened pull request." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="tokens.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="page">
+    <div class="spine" aria-hidden="true"></div>
+
+    <a class="back-link" href="runs.html">&larr; All runs</a>
+
+    <header class="title-row" id="title-row"></header>
+
+    <div id="banner-slot"></div>
+
+    <section class="card" aria-label="Stage progress">
+      <div class="card__tab" aria-hidden="true"></div>
+      <div id="stage-track"></div>
+    </section>
+
+    <div class="run-grid">
+      <div>
+        <section class="card" aria-label="Findings summary">
+          <div class="card__tab" aria-hidden="true"></div>
+          <h3>Findings</h3>
+          <div id="findings"></div>
+        </section>
+      </div>
+      <div>
+        <section class="card" aria-label="Human decisions">
+          <div class="card__tab" aria-hidden="true"></div>
+          <h3>Human calls</h3>
+          <div id="decisions"></div>
+        </section>
+      </div>
+    </div>
+
+    <section class="card" aria-label="Subagent fixes">
+      <div class="card__tab" aria-hidden="true"></div>
+      <h3>Subagent fixes</h3>
+      <div id="fix-intro"></div>
+      <div id="fixes" class="fix-grid"></div>
+    </section>
+
+    <section class="card" aria-label="Gates">
+      <div class="card__tab" aria-hidden="true"></div>
+      <h3>Gates</h3>
+      <div id="gates"></div>
+    </section>
+
+    <section class="card" aria-label="Review">
+      <div class="card__tab" aria-hidden="true"></div>
+      <h3>Review</h3>
+      <div id="review"></div>
+    </section>
+
+    <section class="card" aria-label="Pull request">
+      <div class="card__tab" aria-hidden="true"></div>
+      <h3>Pull request</h3>
+      <div id="pr"></div>
+    </section>
+
+    <section class="card" aria-label="Timeline">
+      <div class="card__tab" aria-hidden="true"></div>
+      <h3>Timeline: the signed log</h3>
+      <div id="timeline"></div>
+    </section>
+  </main>
+
+  <script src="board.js"></script>
+  <script>
+    (function () {
+      "use strict";
+      var B = window.Board;
+
+      function pill(status) {
+        var color = B.pillColor(status);
+        return (
+          '<span class="status-pill ' + color + '"><span class="dot" aria-hidden="true"></span>' +
+          B.pillText(status) +
+          "</span>"
+        );
+      }
+
+      function chip(text, cls) {
+        return '<span class="chip' + (cls ? " " + cls : "") + '">' + B.esc(text) + "</span>";
+      }
+
+      function signerChip(actor) {
+        // Every timeline entry carries its signer: actor + agent/person + kind.
+        var kind = B.KIND_LABEL[actor.__kind] || actor.__kind;
+        var role = B.isAgent(actor.__name) ? "agent" : "person";
+        return chip(role, "muted") + chip(kind, "muted");
+      }
+
+      fetch("./r-0001.json")
+        .then(function (res) {
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return res.json();
+        })
+        .then(function (run) {
+          renderTitle(run);
+          renderBanner(run);
+          renderTrack(run);
+          renderFindings(run);
+          renderDecisions(run);
+          renderFixes(run);
+          renderGates(run);
+          renderReview(run);
+          renderPr(run);
+          renderTimeline(run);
+        })
+        .catch(function (err) {
+          document.getElementById("banner-slot").innerHTML =
+            '<div class="alert" role="alert">Can&rsquo;t read this run: <span class="muted">' +
+            B.esc(err && err.message ? err.message : String(err)) +
+            "</span></div>";
+        });
+
+      function renderTitle(run) {
+        var meta =
+          'requested by ' + B.esc(run.requestedBy || "unknown") + " · " + B.absTime(run.createdAt);
+        document.getElementById("title-row").innerHTML =
+          '<span class="title-row__id mono">' + B.esc(run.runId) + "</span>" +
+          '<a class="title-row__repo" href="https://github.com/' + B.esc(run.repo) + '" target="_blank" rel="noreferrer">' +
+          B.esc(run.repo) + "</a>" +
+          pill(run.status) +
+          '<span class="muted title-row__meta">' + B.esc(meta) + "</span>";
+      }
+
+      function renderBanner(run) {
+        if (run.status !== "blocked" && run.status !== "failed") return;
+        document.getElementById("banner-slot").innerHTML =
+          '<div class="alert" role="alert"><strong>' +
+          (run.status === "blocked" ? "Run blocked" : "Run failed") +
+          "</strong>" +
+          (run.statusReason ? " " + B.esc(run.statusReason) : "") +
+          "</div>";
+      }
+
+      function renderTrack(run) {
+        var states = B.stageStates(run.status, run.events);
+        var stamps = B.stageTimestamps(run.events);
+        var items = "";
+        for (var i = 0; i < B.STAGE_COUNT; i++) {
+          var timeLabel = stamps[i] ? B.absTime(stamps[i]) : "";
+          var title = timeLabel ? B.STAGE_LABELS[i] + " — " + timeLabel : B.STAGE_LABELS[i];
+          items +=
+            '<span class="stage-track__item" data-state="' + states[i] + '" title="' + B.esc(title) +
+            '" tabindex="0" role="img" aria-label="' + B.esc(B.STAGE_LABELS[i] + " " + states[i] + (timeLabel ? " (" + timeLabel + ")" : "")) + '">' +
+            '<span class="stage-track__marker" aria-hidden="true"></span>' +
+            '<span class="stage-track__label">' + B.STAGE_LABELS[i] + "</span></span>";
+        }
+        document.getElementById("stage-track").innerHTML =
+          '<div class="stage-track" role="group" aria-label="' + B.esc(B.pillText(run.status)) + " — stage progress'>" + items + "</div>";
+      }
+
+      function renderFindings(run) {
+        var f = run.findings || {};
+        var bySeverity = f.bySeverity || {};
+        var byFix = f.byFix || {};
+        var total = B.num(f.total);
+        var items = f.items || [];
+        var sevs = ["break", "silent", "deprecated"];
+        var max = 1;
+        sevs.forEach(function (s) {
+          max = Math.max(max, B.num(bySeverity[s]));
+        });
+
+        var bars = sevs
+          .map(function (sev) {
+            var count = B.num(bySeverity[sev]);
+            var pct = total ? Math.round((count / total) * 100) : 0;
+            return (
+              '<div class="sev-bar" role="img" aria-label="' + B.esc(B.SEVERITY_LABEL[sev]) + ": " + count + " (" + pct + "%)" + '">' +
+              '<span class="sev-bar__label">' + B.SEVERITY_LABEL[sev] + "</span>" +
+              '<div class="sev-bar__track"><div class="sev-bar__fill ' + sev + '" style="width:' + Math.round((count / max) * 100) + '%"></div></div>' +
+              '<span class="sev-bar__count">' + count + "</span></div>"
+            );
+          })
+          .join("");
+
+        var fixLine =
+          "Fixed: auto " + B.num(byFix.auto) + " · agent " + B.num(byFix.agent) + " · manual " + B.num(byFix.manual);
+
+        var top = f.top;
+        var topBox = top
+          ? '<div class="top-finding"><div class="top-finding__label">Most important silent change</div>' +
+            '<div class="mono" style="margin:4px 0">' + B.esc(top.file) + ":" + top.line + " · " + B.esc(top.ruleId) + "</div>" +
+            "<div>" + B.esc(top.message) + "</div></div>"
+          : "";
+
+        // Collapsible full table (collapsed by default). Messages truncated to
+        // one line, full text in title.
+        var rows = items
+          .map(function (it, i) {
+            return (
+              "<tr>" +
+              '<td class="mono">' + B.esc(it.file) + "</td>" +
+              "<td>" + B.esc(it.line) + "</td>" +
+              '<td><span class="chip ' + B.SEVERITY_COLOR[it.severity] + '">' + B.esc(B.SEVERITY_LABEL[it.severity]) + "</span></td>" +
+              "<td>" + B.esc(it.fix) + "</td>" +
+              '<td class="mono">' + B.esc(it.ruleId) + "</td>" +
+              '<td style="max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + B.esc(it.message) + '">' +
+              B.esc(it.message) +
+              "</td></tr>"
+            );
+          })
+          .join("");
+
+        document.getElementById("findings").innerHTML =
+          '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">' + bars + "</div>" +
+          '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:12px">' + fixLine + "</div>" +
+          topBox +
+          (items.length
+            ? '<details class="findings-table"><summary>All ' + items.length + " findings</summary>" +
+              '<div class="table-scroll"><table class="table"><thead><tr><th>File</th><th>Line</th><th>Severity</th><th>Fix</th><th>Rule</th><th>Message</th></tr></thead>' +
+              "<tbody>" + rows + "</tbody></table></div></details>"
+            : "");
+      }
+
+      function renderDecisions(run) {
+        var list = run.decisions || [];
+        if (!list.length) {
+          document.getElementById("decisions").innerHTML = '<p class="muted">No human calls needed</p>';
+          return;
+        }
+        document.getElementById("decisions").innerHTML = list
+          .map(function (d, i) {
+            var options = d.options || [];
+            var chosen = options[d.choice];
+            var optsHtml = options.length
+              ? '<ol style="margin:4px 0;padding-left:20px;display:flex;flex-direction:column;gap:2px;font-size:0.9rem">' +
+                options
+                  .map(function (opt, j) {
+                    return '<li style="' + (j === d.choice ? "font-weight:700" : "") + '">' + (j === d.choice ? "✓ " : "") + B.esc(opt) + "</li>";
+                  })
+                  .join("") +
+                "</ol>"
+              : "";
+            var qHtml = d.question ? '<div class="decision__question">' + B.esc(d.question) + "</div>" : "";
+            var callHtml =
+              chosen !== undefined
+                ? '<div class="decision__chosen">Call: <strong>' + B.esc(chosen) + "</strong></div>"
+                : d.choice !== undefined
+                  ? '<div class="decision__chosen">Choice: <strong>' + B.esc(d.choice) + "</strong></div>"
+                  : "";
+            return (
+              '<div class="decision">' +
+              '<div class="decision__rule mono">' + B.esc(d.ruleId) + "</div>" +
+              qHtml +
+              optsHtml +
+              callHtml +
+              '<div class="decision__meta">' + B.esc(d.by) + " · " + B.esc(B.relTime(d.at)) + "</div>" +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+
+      function renderFixes(run) {
+        var fixes = run.fixes || [];
+        document.getElementById("fix-intro").innerHTML =
+          '<p class="muted" style="margin:0 0 12px">Shim fixed ' + B.num(run.autoFixed) + " sites deterministically. " + fixes.length +
+          " files fixed in parallel by Sonnet subagents.</p>";
+        document.getElementById("fixes").innerHTML = fixes
+          .map(function (f) {
+            var blocked = f.status === "blocked";
+            return (
+              '<div class="fix-tile' + (blocked ? " blocked" : "") + '">' +
+              '<div class="fix-tile__head"><span class="mono">' + B.esc(f.file) + '</span><span class="fix-tile__status">' +
+              B.esc(f.status) + "</span></div>" +
+              '<div class="fix-tile__summary">' + B.esc(f.summary) + "</div>" +
+              '<div class="fix-tile__model mono">' + B.esc(f.model) + "</div>" +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+
+      function renderGates(run) {
+        var g = run.gates || {};
+        var baseline = g.baseline || {};
+        var after = g.after || {};
+        var regressions = g.regressions || [];
+        var seen = {};
+        var keys = Object.keys(baseline).concat(Object.keys(after)).filter(function (k) {
+          if (seen[k]) return false;
+          seen[k] = true;
+          return true;
+        });
+        if (!keys.length) {
+          document.getElementById("gates").innerHTML = '<p class="muted">No gates recorded</p>';
+          return;
+        }
+        function cell(v) {
+          return v === true
+            ? '<span class="pass">✅ pass</span>'
+            : v === false
+              ? '<span class="fail">❌ fail</span>'
+              : '<span class="muted">—</span>';
+        }
+        var rows = keys
+          .map(function (k) {
+            var regressed = regressions.indexOf(k) !== -1;
+            return (
+              '<tr class="' + (regressed ? "row-regressed" : "") + '">' +
+              '<td class="gate-name' + (regressed ? " reg-cell" : "") + '">' + B.esc(k) + "</td>" +
+              "<td>" + cell(baseline[k]) + "</td>" +
+              "<td>" + cell(after[k]) + "</td>" +
+              "</tr>"
+            );
+          })
+          .join("");
+        var footer = regressions.length
+          ? '<div style="margin-top:8px;font-size:0.85rem;color:var(--bad)">Regressed: ' + B.esc(regressions.join(", ")) + "</div>"
+          : '<div style="margin-top:8px;font-size:0.85rem;color:var(--ok)">Every gate that passed before still passes</div>';
+        document.getElementById("gates").innerHTML =
+          '<div class="table-scroll"><table class="table" style="white-space:normal"><thead><tr><th>Gate</th><th>Baseline</th><th>After</th></tr></thead><tbody>' +
+          rows +
+          "</tbody></table></div>" +
+          footer;
+      }
+
+      function renderReview(run) {
+        var r = run.review;
+        if (!r) {
+          document.getElementById("review").innerHTML = '<p class="muted">No review recorded</p>';
+          return;
+        }
+        var verdictColor = r.verdict === "changes" ? "warn" : "ok";
+        var notes = (r.notes || []).map(function (n, i) {
+          return '<li>' + B.esc(n) + "</li>";
+        });
+        document.getElementById("review").innerHTML =
+          '<div class="review__head"><span><strong>' + B.esc(r.by) + "</strong> " + chip(B.isAgent(r.by) ? "agent" : "person", "muted") + "</span>" +
+          '<span class="status-pill ' + verdictColor + '"><span class="dot" aria-hidden="true"></span>' + B.esc(r.verdict) + "</span>" +
+          (r.rounds !== undefined ? '<span class="muted">round ' + B.esc(r.rounds) + "</span>" : "") +
+          "</div>" +
+          (notes.length ? '<ol class="review__notes">' + notes.join("") + "</ol>" : "");
+      }
+
+      function renderPr(run) {
+        var approval = run.approval;
+        var pr = run.pr;
+        if (!pr && !approval) {
+          document.getElementById("pr").innerHTML = '<p class="muted">No pull request</p>';
+          return;
+        }
+        var approvalLine = approval
+          ? '<div style="margin-bottom:8px">Approved by ' + B.esc(approval.by || "unknown") +
+            (approval.at ? " · " + B.absTime(approval.at) : "") + "</div>"
+          : "";
+        var link = pr && pr.url
+          ? '<a class="pr-link" href="' + B.esc(pr.url) + '" target="_blank" rel="noreferrer">Open pull request</a>' +
+            '<div class="pr-url">' + B.esc(pr.url) + "</div>"
+          : "";
+        var meta = pr
+          ? '<div class="pr-meta">' +
+            (pr.branch ? '<span class="mono">' + B.esc(pr.branch) + "</span>" : "") +
+            "<span>" + B.num(pr.filesChanged) + " files changed</span>" +
+            '<span class="add">+' + B.num(pr.additions) + '</span><span class="del">−' + B.num(pr.deletions) + "</span>" +
+            "</div>"
+          : "";
+        document.getElementById("pr").innerHTML = approvalLine + link + meta;
+      }
+
+      function renderTimeline(run) {
+        var events = (run.events || []).slice().sort(function (a, b) {
+          var ta = Date.parse(a.t), tb = Date.parse(b.t);
+          if (isNaN(ta) && isNaN(tb)) return 0;
+          if (isNaN(ta)) return 1;
+          if (isNaN(tb)) return -1;
+          return ta - tb;
+        });
+        document.getElementById("timeline").innerHTML =
+          '<ol class="timeline">' +
+          events
+            .map(function (ev, i) {
+              var actor = ev.actor || "unknown";
+              var agent = B.isAgent(actor);
+              var colorToken = B.actorColor(actor);
+              var initial = (actor.charAt(0) || "?").toUpperCase();
+              return (
+                '<li class="log-entry">' +
+                '<span class="log-entry__avatar ' + (agent ? "agent" : "person") + '" style="--avatar-color:var(--' + colorToken + ')" aria-hidden="true">' +
+                B.esc(initial) + "</span>" +
+                '<div class="log-entry__body"><div class="log-entry__line"><span class="who">' + B.esc(actor) + "</span>" +
+                chip(agent ? "agent" : "person", "muted") +
+                chip(B.KIND_LABEL[ev.kind] || ev.kind, "muted") +
+                '<span class="log-entry__time">' + B.esc(B.absTime(ev.t)) + "</span></div>" +
+                (ev.text ? '<div class="log-entry__text">' + B.esc(ev.text) + "</div>" : "") +
+                "</div></li>"
+              );
+            })
+            .join("") +
+          "</ol>";
+      }
+    })();
+  </script>
+</body>
+</html>

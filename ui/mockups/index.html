@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shim Desk — Ledger Board: 3 mockup directions</title>
+<style>
+  /* Comparison page — plain, fast, one system. No framework. */
+  :root{
+    --bg:#FAFAF7; --surface:#FFFFFF; --border:#E6E4DE; --text:#1C1B19;
+    --muted:#6B6862; --accent:#2F5D50; --ok:#2E7D4F; --bad:#B3261E;
+    --radius:8px;
+    --font:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#121212; --surface:#1B1B1B; --border:#2C2C2C; --text:#EDEDEA;
+           --muted:#A3A09A; --accent:#7FB8A6; --ok:#5CC48A; --bad:#F2766E; }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;overflow-x:clip}
+  .page{max-width:1720px;margin:0 auto;padding:24px 16px 48px}
+  h1{font-size:1.5rem;margin:0 0 4px;letter-spacing:-.01em}
+  .sub{color:var(--muted);margin:0 0 20px;max-width:68ch}
+  .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
+  @media (max-width:1100px){.grid{grid-template-columns:1fr;max-width:560px}}
+  .col{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+       padding:16px;display:flex;flex-direction:column;gap:12px}
+  .letter{font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+  .idea{margin:0;font-size:1rem;font-weight:600;line-height:1.35}
+  ul{margin:4px 0;padding-left:18px}
+  li{margin-bottom:4px;font-size:.85rem}
+  .cons li{color:var(--muted)}
+  .h{font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:8px 0 2px}
+  .shots{display:flex;gap:8px}
+  .shot{flex:1;min-width:0}
+  .shot figure{margin:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:#000}
+  .shot img{display:block;width:100%;height:320px;object-fit:cover;object-position:top}
+  .shot figcaption{font-size:.7rem;color:var(--muted);margin-top:4px;font-family:var(--mono)}
+  a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+  .check{border:1px solid var(--border);border-radius:6px;padding:10px;font-size:.78rem;background:var(--bg)}
+  .check h3{margin:0 0 6px;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  .check dl{margin:0}
+  .check dt{font-weight:600;margin-top:6px}
+  .check dd{margin:0 0 2px;color:var(--muted)}
+  .pass{color:var(--ok);font-weight:600}
+  .foot{margin-top:20px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--border);padding-top:12px}
+  .port{font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Ledger Board — 3 directions</h1>
+  <p class="sub">Read-only board showing the real <code style="font-family:var(--mono);font-size:.85em">r-0001</code> run in every
+  mockup (agents did the work, humans made the calls, every gate held, PR&nbsp;#1 exists). Pick a letter — the winner is ported into
+  <code style="font-family:var(--mono);font-size:.85em">ui/src</code> next. Shots below are run-page, 1440 and 960 (split-screen) width.
+  Thumbnails are top-cropped; open the full-length file linked under each column.</p>
+
+  <div class="grid">
+
+    <!-- A -->
+    <div class="col">
+      <span class="letter">A</span>
+      <p class="idea">Refined ledger — today's exact palette and layout, with hierarchy, spacing rhythm, type scale,
+      table density and the stage track (now with hairline connectors) fixed. A safe upgrade.</p>
+
+      <div class="h">Pros</div>
+      <ul>
+        <li>Smallest diff to port: same hex tokens + a few CSS-only refinements, no component changes.</li>
+        <li>Everything already proven on the shipped board; lowest risk before the demo video.</li>
+        <li>Reads the same in light and dark — no new theme to keep correct.</li>
+      </ul>
+
+      <div class="h">Cons</div>
+      <ul class="cons">
+        <li>Subtle: a returning viewer barely notices; least "wow" in the demo's final shot.</li>
+        <li>Keeps today's typeface (system stack) — least distinct from a generic ops board.</li>
+      </ul>
+
+      <div class="shots">
+        <div class="shot"><figure><img src="a-refined-ledger/run-1440.png" alt="A refined ledger, run page 1440" loading="lazy"></figure>
+          <figcaption>run-1440 (top)</figcaption></div>
+        <div class="shot"><figure><img src="a-refined-ledger/run-960.png" alt="A refined ledger, run page 960" loading="lazy"></figure>
+          <figcaption>run-960 (top)</figcaption></div>
+      </div>
+      <a href="a-refined-ledger/run-1440-dark.png" target="_blank">full: run-1440</a> ·
+      <a href="a-refined-ledger/run-1440-dark.png" target="_blank">dark</a> ·
+      <a href="a-refined-ledger/run-375.png" target="_blank">375</a> ·
+      <a href="a-refined-ledger/runs-1440.png" target="_blank">runs page</a>
+
+      <div class="check">
+        <h3>Self-check (from NOTES.md)</h3>
+        <dl>
+          <dt>AA contrast</dt><dd class="pass">PASS</dd>
+          <dd>3 lowest: 5.05 / 5.34 / 5.55 (all 22 pairs ≥ 4.5)</dd>
+          <dt>No h-scroll @375 · focus · status text+colour · no landing-page</dt><dd class="pass">PASS</dd>
+          <dt>sloplint</dt><dd>0 FAIL, 3 WARN, 1 waived (side-stripe, spec-mandated)</dd>
+          <dt>Numbers match r-0001.json</dt><dd class="pass">PASS</dd>
+        </dl>
+      </div>
+
+      <p class="port">Est. port: tokens.css + CSS-only connectors → small.</p>
+    </div>
+
+    <!-- B -->
+    <div class="col">
+      <span class="letter">B</span>
+      <p class="idea">Ops console — dark-first and denser: 13px type, JetBrains&nbsp;Mono accents, a crisp thin
+      status-rail stage track, and square-vs-round timeline avatars. Built for the 960px split-screen shot; light mode is correct too.</p>
+
+      <div class="h">Pros</div>
+      <ul>
+        <li>Best fit for the split-screen demo shot: dense, mono, reads at 960px next to Mattermost.</li>
+        <li>Darkest/most ops-native of the three — the "PR exists, gates held" story reads at a glance.</li>
+        <li>Both themes correct; lowest contrast ratios still ≥ 5.76 in each.</li>
+      </ul>
+
+      <div class="h">Cons</div>
+      <ul class="cons">
+        <li>Most to port: StageTrack becomes a rail, Timeline avatars get shape + a token or two.</li>
+        <li>Dark-first may need review that light mode stays the default in the real app (spec: light default).</li>
+      </ul>
+
+      <div class="shots">
+        <div class="shot"><figure><img src="b-ops-console/run-1440.png" alt="B ops console, run page 1440 dark" loading="lazy"></figure>
+          <figcaption>run-1440 dark (top)</figcaption></div>
+        <div class="shot"><figure><img src="b-ops-console/run-960.png" alt="B ops console, run page 960 dark" loading="lazy"></figure>
+          <figcaption>run-960 dark (top)</figcaption></div>
+      </div>
+      <a href="b-ops-console/run-1440-light.png" target="_blank">full: run-1440 dark</a> ·
+      <a href="b-ops-console/run-1440-light.png" target="_blank">light</a> ·
+      <a href="b-ops-console/run-375.png" target="_blank">375</a> ·
+      <a href="b-ops-console/runs-1440.png" target="_blank">runs page</a>
+
+      <div class="check">
+        <h3>Self-check (from NOTES.md)</h3>
+        <dl>
+          <dt>AA contrast (both themes)</dt><dd class="pass">PASS</dd>
+          <dd>dark lowest 6.31/6.35/6.54 · light lowest 5.76/6.01/6.20</dd>
+          <dt>No h-scroll @375 · focus · status text+colour · no landing-page</dt><dd class="pass">PASS</dd>
+          <dt>sloplint</dt><dd>0 FAIL, 2 WARN (regression/fix-tile side-stripe, spec-mandated)</dd>
+          <dt>Numbers match r-0001.json</dt><dd class="pass">PASS</dd>
+        </dl>
+      </div>
+
+      <p class="port">Est. port: token swap + StageTrack rail + Timeline avatar shape + PrCard token → medium.</p>
+    </div>
+
+    <!-- C -->
+    <div class="col">
+      <span class="letter">C</span>
+      <p class="idea">Paper logbook in the getshim.dev brand — warm cream paper, Bricolage&nbsp;Grotesque headings,
+      a 1px border on every card, #FFD84D reserved for graphic marks, and a signed-log timeline
+      (filled disc = person, ringed disc = agent) so person-vs-agent is legible at a glance.</p>
+
+      <div class="h">Pros</div>
+      <ul>
+        <li>Most distinctive and on-brand: the board and getshim.dev read as one product.</li>
+        <li>Best "3-second story" — the signed-log timeline makes human-calls vs agent-work unmissable.</li>
+        <li>Editorial warmth suits the README screenshot more than the two dense consoles.</li>
+      </ul>
+
+      <div class="h">Cons</div>
+      <ul class="cons">
+        <li>Most to port: new display font, bordered-card recipe, timeline avatar + <code>&lt;details&gt;</code> findings table.</li>
+        <li>Cream/ruled aesthetic is the farthest from today's calm-neutral board; biggest taste swing.</li>
+      </ul>
+
+      <div class="shots">
+        <div class="shot"><figure><img src="c-paper-logbook/run-1440.png" alt="C paper logbook, run page 1440" loading="lazy"></figure>
+          <figcaption>run-1440 (top)</figcaption></div>
+        <div class="shot"><figure><img src="c-paper-logbook/run-960.png" alt="C paper logbook, run page 960" loading="lazy"></figure>
+          <figcaption>run-960 (top)</figcaption></div>
+      </div>
+      <a href="c-paper-logbook/run-1440-dark.png" target="_blank">full: run-1440</a> ·
+      <a href="c-paper-logbook/run-1440-dark.png" target="_blank">dark</a> ·
+      <a href="c-paper-logbook/run-375.png" target="_blank">375</a> ·
+      <a href="c-paper-logbook/runs-1440.png" target="_blank">runs page</a>
+
+      <div class="check">
+        <h3>Self-check (from NOTES.md)</h3>
+        <dl>
+          <dt>AA contrast (both themes)</dt><dd class="pass">PASS</dd>
+          <dd>light lowest 4.96/5.15/5.30 · dark 6.21/6.50/6.87 (--warn deepened to #9a5f00 to hold AA)</dd>
+          <dt>No h-scroll @375 · focus · status text+colour · no landing-page</dt><dd class="pass">PASS</dd>
+          <dt>sloplint</dt><dd>0 FAIL, 1 REFLEX + 6 WARN waived (mirror production look / signature stripes)</dd>
+          <dt>Numbers match r-0001.json</dt><dd class="pass">PASS</dd>
+        </dl>
+      </div>
+
+      <p class="port">Est. port: token swap + new font link + Timeline avatar/connector + FindingsTable &lt;details&gt; → medium-large.</p>
+    </div>
+
+  </div>
+
+  <p class="foot">All three render the real <code style="font-family:var(--mono);font-size:.85em">ledger/r-0001.json</code> (data-driven fetch, nothing hard-coded),
+  are read-only, and are self-contained under <code style="font-family:var(--mono);font-size:.85em">ui/mockups/</code> — open a folder's
+  <code style="font-family:var(--mono);font-size:.85em">runs.html</code>/<code style="font-family:var(--mono);font-size:.85em">run.html</code> with Vite (no build).
+  The real board (<code style="font-family:var(--mono);font-size:.85em">ui/src</code>) is untouched: unit tests 38/38 and e2e 3/3 green.
+  Reply with a letter (A / B / C) and any tweaks.</p>
+</div>
+</body>
+</html>
