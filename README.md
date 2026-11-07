@@ -4,7 +4,7 @@
 
 **Real run [r-0001](https://github.com/JayanthMalladi/shim-demo-app/pull/1):** `@shim` scanned `shim-demo-app` for the AI SDK 6→7 upgrade, found **30 findings across 7 files (18 silent)**, the humans made the 2 judgment calls (`node-22`, `telemetry-needs-otel`), Shim applied **12 deterministic fixes** and **6 files were fixed in parallel by Sonnet subagents**, every gate held, an independent `@reviewer` agent approved it, and a human opened **[PR #1](https://github.com/JayanthMalladi/shim-demo-app/pull/1)** (11 files, +244/−203). All of it is on the record in the [ledger board](#ledger-board).
 
-[**GIF / 20s clip of the room**](TODO: link the recorded clip — video is WP-J)
+**Live ledger board:** [shim-desk-ui.vercel.app](https://shim-desk-ui.vercel.app/)
 
 ## The problem: silent breaking changes
 
@@ -45,19 +45,89 @@ This is a **Switch workflow** — Switch is central, not decorative:
    work/<runId>/<repo>   →   ledger/<runId>.json   →   read-only Ledger board (ui/)
 ```
 
-## Quickstart (~10 min)
+## Set it up (about 20 minutes)
 
-Prerequisites → install Switch Console → start a **local** server → clone `shim-desk` → `npm run setup` → import `switch/shim-desk.template.yaml` (set the directory to your clone) → in Mattermost, `~shim-desk`:
+### What you need
+
+| | Why |
+|---|---|
+| **Switch Console** with a local server ([docs](https://docs.switchagents.ai)) | the room, the two agents, the hand-off and the permission prompts |
+| **Docker** | Switch's local server runs the bundled Mattermost in Docker |
+| **Node 22+** and **git** | the scripts and `getshim` need Node 22 |
+| **Claude Code** (`claude`), signed in | both agents are Claude Code agents |
+| **GitHub CLI** (`gh`), signed in as the owner of the repo you'll upgrade | the lead pushes a branch and opens the PR after you approve |
+
+Switch runs agents on Linux or macOS. On Windows, see [Windows](#windows) below.
+
+### 1. Clone and check your machine
+
+```bash
+git clone https://github.com/JayanthMalladi/shim-desk
+cd shim-desk
+npm ci
+npm run setup          # runs scripts/doctor.mjs, then installs the board's dependencies
+```
+
+`doctor` prints a ✅/❌ table for node, git, gh, docker, claude, `.gitignore` and `getshim`. Its `gh` check looks for the `JayanthMalladi` account. If you use your own account, run `node scripts/doctor.mjs --skip gh` and check `gh auth status` yourself.
+
+### 2. Point it at your own GitHub account
+
+The agents only ever push to repos owned by one account. That account is written in a few places. Replace `JayanthMalladi` with your GitHub username in:
+
+- `CLAUDE.md`
+- `switch/room-instructions.md` and the room `instructions` in `switch/shim-desk.template.yaml`
+- `.claude/skills/shim-upgrade/SKILL.md`
+
+### 3. Get a repo to upgrade
+
+Fork [`JayanthMalladi/shim-demo-app`](https://github.com/JayanthMalladi/shim-demo-app). Its `main` is the `v6-baseline` tag, a small AI SDK 6 app with known silent breaks. Any app of yours on `ai@6` works too.
+
+### 4. Start Switch and import the template
+
+1. Open Switch Console, start a **local** server, and sign in the Claude provider.
+2. Import `switch/shim-desk.template.yaml`. Set **owner** to a short handle (it names the agents, for example `shim-lead.<handle>`) and **directory** to the path of your clone.
+3. The template creates both agents (`shim-lead.<handle>` and `shim-reviewer.<handle>`), the public room `~shim-desk` with the aliases `@shim` and `@reviewer`, the `fixer` and `reviewer` roles, and a kickoff message where each agent introduces itself.
+
+### 5. Run an upgrade
+
+In Mattermost, open `~shim-desk` and post:
 
 ```
-@shim upgrade ai to v7 in <your fork of shim-demo-app>
+@shim upgrade ai to v7 in <your-username>/shim-demo-app
 ```
 
-<details>
-<summary>On this demo machine (WSL2 execution host)</summary>
+What happens next, all in the request's thread:
 
-Because this Windows Console build can't run agent sessions locally, the two agents run on the WSL2 host. One-time host prep (already done for this entry): `openssh-server` + sshd on :22, the Windows `id_ed25519` key authorized, `gh` installed, `claude` signed in, `gh auth login` (your account). In Console: **Settings → Remote hosts → Add host** `root@<wslip>` (alias `wsl-switch`), then create the two agents with **Run location = the WSL host** and **Directory = `/mnt/d/shim-desk`**. See `docs/DECISIONS.md`.
-</details>
+1. `@shim` scans with Shim and posts the findings (how many, how many are silent, and the most important one).
+2. It asks numbered **DECISION** questions for calls that aren't the agent's to make (for example, require Node 22?). Reply with the number.
+3. It applies Shim's deterministic fixes, sends one fixer subagent per remaining file in parallel, and runs the repo's gates against the baseline. If a gate that passed before now fails, it stops and says so. No PR.
+4. It hands the diff to `@reviewer`, a separate agent, which replies with one `VERDICT` line.
+5. You reply `approve`. Switch shows an **Allow once / Decline** prompt before the push. Allow it, and `@shim` posts the PR link.
+6. The run is written to `ledger/r-NNNN.json` and to the room's "Upgrade ledger" document.
+
+To try it again on the demo app, close the PR, delete its branch, and post the request again.
+
+### 6. See the run on the ledger board
+
+```bash
+npm run ui             # http://localhost:5173, reads ledger/*.json live
+```
+
+To host it, import the repo into Vercel. `vercel.json` builds `ui/` with no extra settings: leave Root Directory empty.
+
+### Tests
+
+```bash
+npm test               # scripts and ledger
+npm --prefix ui test   # board
+```
+
+### Windows
+
+Switch's Windows Console (early access, v0.40.1 here) can't run agent sessions on Windows itself ("SDK sessions require a POSIX SSH execution event"). Run the agents on Linux inside WSL2 instead:
+
+- **Simplest:** install Switch Console's Linux build inside WSL2 and run everything there (WSLg shows the window). Clone `shim-desk` inside WSL and use that path as the template's **directory**.
+- **Or** keep Console on Windows and add WSL2 as a remote host (Settings → Remote hosts), with `claude` and `gh` signed in on the WSL side. Adding the host can fail with an SSH agent error ([switch#1472](https://github.com/sandbox-quantum/switch/issues/1472)). `docs/SWITCH-BLOCKER.md` and `docs/DECISIONS.md` record what we hit and what fixed it.
 
 ## What is real vs demo setup
 
@@ -73,8 +143,8 @@ Because this Windows Console build can't run agent sessions locally, the two age
 
 ## Ledger board
 
-[The board](https://JayanthMalladi.github.io/shim-desk/) · ![runs](docs/board-runs.png) · ![run](docs/board-run.png)
-Read-only over `ledger/*.json`; the board lists only real runs (files named `r-NNNN.json`), so a fresh clone shows the single committed run `r-0001`. `example-r-0000.json` is a test fixture (imported directly by `ui/test/RunPage.test.tsx`) and is never listed. (URL is live once the repo's Pages source is set to GitHub Actions; the workflow is `.github/workflows/pages.yml`.)
+[The board](https://shim-desk-ui.vercel.app/) · ![runs](docs/board-runs.png) · ![run](docs/board-run.png)
+Read-only over `ledger/*.json`; the board lists only real runs (files named `r-NNNN.json`), so a fresh clone shows the single committed run `r-0001`. `example-r-0000.json` is a test fixture (imported directly by `ui/test/RunPage.test.tsx`) and is never listed. It is deployed on Vercel from `vercel.json`.
 
 ## Built during the hackathon
 
