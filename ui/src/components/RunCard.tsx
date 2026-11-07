@@ -1,7 +1,7 @@
 import type { Run } from "../data";
 import { StatusPill } from "./StatusPill";
 import { StageTrack } from "./StageTrack";
-import { relTime } from "../format";
+import { relTime, absTime } from "../format";
 
 const num = (v: unknown): number => (typeof v === "number" ? v : 0);
 
@@ -14,11 +14,8 @@ export function gateStats(run: Run): { green: number; total: number } {
   return { green, total: keys.length };
 }
 
-/** One run on the Runs page (02 §5.1). "Stretched link" pattern: an absolutely
- *  positioned <a> fills the whole card (incl. padding), so the entire card
- *  links to #/run/<runId>. The content wrapper is pointer-events:none so
- *  clicks fall through to that link; the PR link (when present) re-enables
- *  pointer events and paints on top, so it stays clickable. No nested <a>. */
+/** One run on the Runs page (02 §5.1). A stretched link makes the whole card
+ *  open #/run/<runId>; the PR link sits above it so it stays clickable. */
 export function RunCard({ run }: { run: Run }) {
   const total = num(run.findings?.total);
   const silent = num(run.findings?.bySeverity?.silent);
@@ -27,73 +24,28 @@ export function RunCard({ run }: { run: Run }) {
   const pr = run.pr?.url;
 
   return (
-    <article
-      aria-label={`run ${run.runId}`}
-      style={{
-        position: "relative",
-        background: "var(--surface, #fff)",
-        border: "1px solid var(--border, #E6E4DE)",
-        borderRadius: 8,
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-      }}
-    >
-      <a href={`#/run/${run.runId}`} style={{ position: "absolute", inset: 0 }} />
-      <div
-        style={{
-          position: "relative",
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          padding: 16,
-          paddingBottom: pr ? 0 : 16,
-          pointerEvents: "none",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-          <span
-            className="mono"
-            style={{
-              fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
-              fontSize: "0.9em",
-            }}
-          >
-            {run.runId}
-          </span>
-          <span>{run.repo}</span>
-          <span className="muted">{relTime(run.createdAt)}</span>
-          <StatusPill status={run.status} events={run.events} />
-        </div>
-        <StageTrack status={run.status} events={run.events} variant="compact" />
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-          <span className="chip">{total} findings</span>
-          <span
-            className="chip"
-            style={{ color: "var(--silent, #7A4FB5)", borderColor: "var(--silent, #7A4FB5)" }}
-          >
-            {silent} silent
-          </span>
-          <span className="chip">{decisions.length} decisions</span>
-          <span className="chip">gates {gates.green}/{gates.total}</span>
-        </div>
+    <article className="run-card" aria-label={`run ${run.runId}`}>
+      <a className="rc-link" href={`#/run/${run.runId}`} aria-label={`Details for ${run.runId}`} />
+      <div className="rc-head">
+        <span className="mono rc-id">{run.runId}</span>
+        <span className="rc-repo">{run.repo}</span>
+        <StatusPill status={run.status} events={run.events} />
+        <time className="rc-time" dateTime={run.createdAt} title={absTime(run.createdAt)}>
+          {relTime(run.createdAt)}
+        </time>
       </div>
-      {pr ? (
-        <a
-          href={pr}
-          target="_blank"
-          rel="noreferrer"
-          style={{
-            position: "relative",
-            pointerEvents: "auto",
-            padding: "0 16px 16px 16px",
-            fontSize: "0.9rem",
-            display: "block",
-          }}
-        >
-          PR: {pr}
-        </a>
-      ) : null}
+      <StageTrack status={run.status} events={run.events} variant="compact" />
+      <ul className="chips" aria-label="Run numbers">
+        <li>{total} findings</li>
+        <li className="chip-silent">{silent} silent</li>
+        <li className="chip-human">{decisions.length} human calls</li>
+        <li className="chip-ok">gates {gates.green}/{gates.total}</li>
+        {pr ? (
+          <li className="chip-pr">
+            <a href={pr} target="_blank" rel="noreferrer">PR #{pr.split("/").pop()}</a>
+          </li>
+        ) : null}
+      </ul>
     </article>
   );
 }

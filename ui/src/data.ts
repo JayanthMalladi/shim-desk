@@ -13,7 +13,9 @@ function base(): string {
   // document.baseURI minus the trailing path of index.html: with base './'
   // Vite rewrites the script tag to './src/main.tsx', so the parent of
   // that URL is the site root.
-  const href = document.baseURI;
+  // Drop the hash route and query first: baseURI keeps them, and
+  // '#/run/r-0001' would otherwise become part of the data path.
+  const href = document.baseURI.split('#')[0].split('?')[0];
   return href.replace(/[^/]*$/, '');
 }
 

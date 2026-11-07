@@ -1,0 +1,25 @@
+/* B. Ops console: dark-first, denser, mono accents. Light mode via prefers-color-scheme: light. */
+:root {
+  color-scheme: dark;
+  --bg: #0E1012; --surface: #15181B; --border: #262B30; --track: #22272C;
+  --text: #E8EAEC; --muted: #9AA3AB; --accent: #6FD3B0; --focus: #6FD3B0;
+  --ok: #4ADE95; --ok-bg: #12261C; --warn: #F2B544; --bad: #FF7A70; --silent: #C3A6FF; --silent-bg: #1D1830;
+  --human: #F2B544; --on-human: #101214; --agent: #6FD3B0; --agent-bg: #10231D;
+  --rail-off: #2A3036;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-head: var(--font-body); --head-weight: 600;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --fs-xs: 11.5px; --fs-sm: 13px; --fs-body: 14px; --fs-md: 15px; --fs-lg: 16px; --fs-xl: 22px; --fs-stat: 28px;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 14px; --s5: 20px; --s6: 28px; --s7: 40px;
+  --radius: 4px; --max: 1320px; --gutter: 24px;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    --bg: #F4F5F6; --surface: #FFFFFF; --border: #DADDE1; --track: #E6E8EB;
+    --text: #15181B; --muted: #5B636B; --accent: #0F7A5C; --focus: #0F7A5C;
+    --ok: #157A47; --ok-bg: #E5F4EC; --warn: #8F5A00; --bad: #B3261E; --silent: #6B42B0; --silent-bg: #F2EDFB;
+    --human: #8F5A00; --on-human: #FFFFFF; --agent: #0F7A5C; --agent-bg: #E3F3EE; --rail-off: #DADDE1;
+  }
+}
+@media (max-width: 600px) { :root { --gutter: 16px; } }

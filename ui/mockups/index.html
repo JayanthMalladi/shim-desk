@@ -1,0 +1,127 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shim Desk Board Directions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: a short decision header, three directions side by side, then one section per direction. */
+:root {
+  --bg: #F7F6F2; --surface: #FFFFFF; --line: #DEDBD2; --fg: #1B1A17; --muted: #5F5B53; --accent: #1F5E4F; --mark: #FFD84D;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #141412; --surface: #1C1B19; --line: #34322D; --fg: #EEEBE3; --muted: #ADA899; --accent: #8CC7B4; --mark: #FFD84D; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #141412; --surface: #1C1B19; --line: #34322D; --fg: #EEEBE3; --muted: #ADA899; --accent: #8CC7B4; --mark: #FFD84D; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; line-height: 1.2; }
+h1 { font-size: 28px; }
+h2 { font-size: 21px; }
+h3 { font-size: 15px; }
+p { margin: 0; }
+a { color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.muted { color: var(--muted); }
+code { font-family: var(--mono); font-size: 0.9em; }
+header { display: flex; flex-direction: column; gap: 10px; max-width: 72ch; }
+.pick { margin-top: 18px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--mark); border-radius: 8px; max-width: 72ch; display: flex; flex-direction: column; gap: 6px; }
+.glance { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
+.col { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.col h3 { display: flex; gap: 8px; align-items: baseline; }
+.letter { font-family: var(--mono); font-weight: 700; }
+.frame { display: block; border: 1px solid var(--line); border-radius: 8px; overflow: auto; background: var(--surface); }
+.frame img { display: block; width: 100%; height: auto; }
+.frame.tall { max-height: 560px; }
+.frame.short { max-height: 440px; }
+section.dir { margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 16px; }
+.idea { max-width: 72ch; }
+.shots { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr) minmax(0, 0.7fr); gap: 12px; align-items: start; }
+.shots figure { margin: 0; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+figcaption { font-size: 13px; color: var(--muted); }
+.lists { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.lists > div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; min-width: 0; }
+.lists ul { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.check li::marker { content: "✓  "; color: var(--accent); }
+.time { font-family: var(--mono); font-size: 13px; }
+@media (max-width: 900px) {
+  .glance, .lists { grid-template-columns: minmax(0, 1fr); }
+  .shots { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .shots figure:first-child { grid-column: 1 / -1; }
+}
+</style>
+</head><body>
+
+<div class="wrap">
+  <header>
+    <h1>Shim Desk board: three directions</h1>
+    <p class="muted">Each mockup renders the real <code>ledger/r-0001.json</code> (1 run, 1 PR, 2 human calls, 18 silent breaks). Nothing is invented and the live board in <code>ui/src</code> is untouched. All three fix the same two data bugs from today's board: the <code>build</code> gate now says "not run" at baseline instead of "fail", and each human call shows what it was about.</p>
+  </header>
+  <div class="pick">
+    <h3>My recommendation: C, the paper logbook</h3>
+    <p>It looks like getshim.dev, so the README, the site and the video end card read as one product. The yellow rows make "people made the calls, agents did the work" obvious in about a second, which is the hackathon's thesis. B is the better pick if the video shot is mostly dark and you want the PR and log beside the work at full width.</p>
+    <p class="muted">Reply with a letter and any tweaks, and I'll port it into <code>ui/src</code>.</p>
+  </div>
+
+  <div class="glance">
+    <div class="col">
+      <h3><span class="letter">A</span> Refined ledger</h3>
+      <a class="frame tall" href="a-refined-ledger/run-1440.png"><img src="a-refined-ledger/run-1440.png" alt="Direction A run page at 1440px, light"></a>
+    </div>
+    <div class="col">
+      <h3><span class="letter">B</span> Ops console</h3>
+      <a class="frame tall" href="b-ops-console/run-1440.png"><img src="b-ops-console/run-1440.png" alt="Direction B run page at 1440px, dark"></a>
+    </div>
+    <div class="col">
+      <h3><span class="letter">C</span> Paper logbook</h3>
+      <a class="frame tall" href="c-paper-logbook/run-1440.png"><img src="c-paper-logbook/run-1440.png" alt="Direction C run page at 1440px, light"></a>
+    </div>
+  </div>
+
+  <section class="dir" id="a">
+    <h2><span class="letter">A</span> Refined ledger</h2>
+    <p class="idea">Today's board, tightened: same tokens and layout, a one-sentence story under the title, a connected stage track with times, and one log where people (round amber) and agents (square green) look different.</p>
+    <div class="shots">
+      <figure><a class="frame short" href="a-refined-ledger/runs-1440.png"><img src="a-refined-ledger/runs-1440.png" alt="Direction A runs page"></a><figcaption>Runs page, 1440</figcaption></figure>
+      <figure><a class="frame short" href="a-refined-ledger/run-960.png"><img src="a-refined-ledger/run-960.png" alt="Direction A run page at 960px"></a><figcaption>960, split-screen width</figcaption></figure>
+      <figure><a class="frame short" href="a-refined-ledger/run-375.png"><img src="a-refined-ledger/run-375.png" alt="Direction A run page on a phone"></a><figcaption>375, phone</figcaption></figure>
+    </div>
+    <p><a href="a-refined-ledger/run-1440-dark.png">Dark mode, 1440</a></p>
+    <div class="lists">
+      <div><h3>Pros</h3><ul><li>Lowest risk; the tests barely move.</li><li>Clear story line and stage times.</li><li>Person and agent are distinct in the log.</li></ul></div>
+      <div><h3>Cons</h3><ul><li>Still reads as a generic dashboard.</li><li>Least memorable on video.</li></ul></div>
+      <div><h3>Self-check</h3><ul class="check"><li>AA in both themes (lowest 5.14)</li><li>No scroll at 375</li><li>Sloplint: 0 fail, 0 reflex</li></ul><p class="time">Port: about 30 min</p></div>
+    </div>
+  </section>
+
+  <section class="dir" id="b">
+    <h2><span class="letter">B</span> Ops console</h2>
+    <p class="idea">Dark-first and denser: a status rail across the top, the work on the left, and the PR card plus the person/agent log pinned on the right so they stay in view.</p>
+    <div class="shots">
+      <figure><a class="frame short" href="b-ops-console/runs-1440.png"><img src="b-ops-console/runs-1440.png" alt="Direction B runs page"></a><figcaption>Runs page, 1440</figcaption></figure>
+      <figure><a class="frame short" href="b-ops-console/run-960.png"><img src="b-ops-console/run-960.png" alt="Direction B run page at 960px"></a><figcaption>960, split-screen width (stacks to one column)</figcaption></figure>
+      <figure><a class="frame short" href="b-ops-console/run-375.png"><img src="b-ops-console/run-375.png" alt="Direction B run page on a phone"></a><figcaption>375, phone</figcaption></figure>
+    </div>
+    <p><a href="b-ops-console/run-1440-light.png">Light mode, 1440</a></p>
+    <div class="lists">
+      <div><h3>Pros</h3><ul><li>Strongest at full width: PR and log always visible.</li><li>Looks right next to a dark Mattermost.</li><li>Dense; the whole run fits on about one screen.</li></ul></div>
+      <div><h3>Cons</h3><ul><li>At 960 it stacks, so the side-panel advantage is lost in the split shot.</li><li>Dark default diverges from the light getshim.dev site.</li></ul></div>
+      <div><h3>Self-check</h3><ul class="check"><li>AA in both themes (lowest 4.63)</li><li>No scroll at 375</li><li>Sloplint: 0 fail, 0 reflex, 1 waived</li></ul><p class="time">Port: about 50 min</p></div>
+    </div>
+  </section>
+
+  <section class="dir" id="c">
+    <h2><span class="letter">C</span> Paper logbook</h2>
+    <p class="idea">The board as Shim's signed logbook in the getshim.dev look: ink-outlined cards with the site's offset shadow, Bricolage Grotesque heads, and the brand yellow used only for what people did.</p>
+    <div class="shots">
+      <figure><a class="frame short" href="c-paper-logbook/runs-1440.png"><img src="c-paper-logbook/runs-1440.png" alt="Direction C runs page"></a><figcaption>Runs page, 1440</figcaption></figure>
+      <figure><a class="frame short" href="c-paper-logbook/run-960.png"><img src="c-paper-logbook/run-960.png" alt="Direction C run page at 960px"></a><figcaption>960, split-screen width</figcaption></figure>
+      <figure><a class="frame short" href="c-paper-logbook/run-375.png"><img src="c-paper-logbook/run-375.png" alt="Direction C run page on a phone"></a><figcaption>375, phone</figcaption></figure>
+    </div>
+    <p><a href="c-paper-logbook/run-1440-dark.png">Dark mode, 1440</a></p>
+    <div class="lists">
+      <div><h3>Pros</h3><ul><li>Matches getshim.dev; one product across site, README and video.</li><li>Yellow person rows make the thesis readable at a glance.</li><li>Most distinctive in a 1080p screenshot.</li></ul></div>
+      <div><h3>Cons</h3><ul><li>Least dense; the run page is the longest.</li><li>Adds a Google Font and a new Timeline layout.</li></ul></div>
+      <div><h3>Self-check</h3><ul class="check"><li>AA in both themes (lowest 4.73)</li><li>No scroll at 375</li><li>Sloplint: 0 fail, 0 reflex</li></ul><p class="time">Port: about 45 min</p></div>
+    </div>
+  </section>
+</div>
+</body></html>

@@ -1,0 +1,75 @@
+/* Hallmark · v2.0.0 · shape: app screen · theme: getshim.dev brand (by request) · nav: wordmark and one link · footer: none */
+/* Hallmark · pre-emit critique: P4 H5 E5 S4 R4 V4 · weakest: R, the offset shadows cost density; yellow is kept for people only */
+/* Hallmark · dismissed 3 · the silent box is the spec's highlighted top finding, one per page */
+/* C. Paper logbook. Bordered cards with the site's offset shadow, a ruled log
+   where each person's entry is signed and marked in yellow. */
+.brand { font-size: 22px; }
+.brand .mark { width: 22px; height: 16px; background: var(--human-mark); border: 2px solid var(--border); border-radius: 4px 4px 10px 10px; }
+.card, .stat, .run-card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.card { padding: var(--s5) var(--s5) var(--s5); }
+.card h2 { font-size: var(--fs-md); }
+.stats { gap: var(--s4); }
+.stat { padding: var(--s4) var(--s5); }
+.stat-n { font-family: var(--font-head); font-size: var(--fs-stat); font-weight: 650; }
+.stat-l { color: var(--muted); }
+.stat-silent .stat-n { color: var(--silent); }
+.stat-human .stat-n { background: linear-gradient(transparent 55%, var(--human-mark) 55%); color: var(--on-human); align-self: flex-start; padding: 0 2px; }
+.run-card { padding: var(--s4) var(--s5); transition: transform 120ms ease, box-shadow 120ms ease; }
+.run-card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--border); }
+.rc-id { font-weight: 600; }
+.rc-repo { font-family: var(--font-head); font-weight: 650; font-size: var(--fs-lg); }
+.chips li { font-size: var(--fs-sm); padding: 2px var(--s3); border: 1.5px solid var(--border); border-radius: 999px; }
+.chips .chip-silent { color: var(--silent); border-color: var(--silent); }
+.chips .chip-human { background: var(--human-mark); color: var(--on-human); border-color: var(--human-mark); }
+.chips .chip-ok, .chips .chip-pr { background: var(--ok-bg); color: var(--ok); border-color: var(--ok); }
+
+.pill { font-size: var(--fs-sm); font-weight: 650; padding: var(--s1) var(--s3); border-radius: 999px; border: 2px solid var(--border); }
+.pill-ok { background: var(--ok-bg); color: var(--ok); border-color: var(--ok); }
+.pill-warn { color: var(--warn); } .pill-bad { color: var(--bad); }
+.title { margin-bottom: var(--s6); }
+.title h1 { font-size: var(--fs-xl); letter-spacing: -0.01em; }
+.story { font-family: var(--font-head); font-size: 21px; font-weight: 500; line-height: 1.4; margin-top: var(--s2); }
+.story .t-human { background: linear-gradient(transparent 55%, var(--human-mark) 55%); color: var(--on-human); }
+
+/* Stage track: a ruled strip of stamped boxes. */
+.track { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: var(--s4); gap: var(--s2); }
+.st-mark { width: 26px; height: 26px; border: 2px solid var(--border); border-radius: 7px; font-weight: 800; font-size: 13px; background: var(--surface); }
+.st-done .st-mark { background: var(--ok-bg); color: var(--ok); border-color: var(--ok); }
+.st-label { font-weight: 600; }
+.track-compact { border: 0; box-shadow: none; padding: 0; }
+.track-compact .st-label { display: none; }
+.track-compact .st-mark { width: 16px; height: 16px; border-radius: 4px; font-size: 0; }
+
+.top-silent { border: 2px solid var(--silent); border-left-width: 6px; border-radius: 10px; }
+.fix { border: 1.5px solid var(--border); border-radius: 10px; padding: var(--s3) var(--s4); }
+.fix-file { font-size: var(--fs-sm); }
+.pr { background: var(--ok-bg); }
+.pr-link { font-family: var(--font-head); font-size: 22px; color: var(--text); }
+.who-person + .role, .ev-person .role { background: var(--human-mark); color: var(--on-human); border-color: var(--human-mark); }
+
+/* The signed log: a ruled ledger, time in the margin, each entry signed. */
+.timeline { padding-left: 0; padding-right: 0; }
+.timeline h2, .timeline .legend { padding: 0 var(--s5); }
+.lg-person::before { background: var(--human-mark); border: 1.5px solid var(--border); }
+.ev { grid-template-columns: 4.5rem minmax(0, 1fr); gap: var(--s4); padding: var(--s3) var(--s5); border-top: 1px solid var(--rule); }
+.ev::after { display: none; }
+.ev-av { display: none; }
+.ev-time { font-size: var(--fs-sm); color: var(--muted); border-right: 2px solid var(--bad); padding-right: var(--s3); }
+.ev-body { display: flex; flex-direction: column; gap: 2px; }
+.ev-meta { order: 3; font-family: var(--font-head); font-size: var(--fs-sm); }
+.ev-meta .who::before { content: "signed "; font-weight: 400; color: var(--muted); }
+.ev-text { order: 1; }
+.ev-detail { order: 2; }
+.ev-person { background: color-mix(in srgb, var(--human-mark) 28%, var(--surface)); }
+.ev-person .ev-text { font-weight: 650; }
+.ev-blocked .ev-text { color: var(--warn); }
+@media (max-width: 760px) {
+  .ev { grid-template-columns: minmax(0, 1fr); gap: var(--s1); }
+  .ev-time { border-right: 0; padding: 0; }
+}
+.ev-person { box-shadow: inset 4px 0 0 var(--human-mark); }
+@media (prefers-color-scheme: dark) {
+  .story .t-human, .stat-human .stat-n { background: none; color: var(--human-mark); }
+  .ev-person { background: color-mix(in srgb, var(--human-mark) 9%, var(--surface)); }
+  .ev-person .ev-text { color: var(--human-mark); }
+}

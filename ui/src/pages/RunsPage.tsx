@@ -78,17 +78,20 @@ export function RunsPage() {
 
   // Summary strip (02 §5.1): four stat tiles, always computed from the data.
   const stats = [
-    { label: "Runs", value: sorted.length },
+    { label: sorted.length === 1 ? "run" : "runs", value: sorted.length, cls: "" },
     {
       label: "PRs opened",
       value: sorted.filter((r) => r.status === "done" && r.pr?.url).length,
+      cls: "",
     },
     {
-      label: "Human decisions",
+      label: "human calls",
+      cls: "stat-human",
       value: sorted.reduce((acc, r) => acc + (r.decisions?.length ?? 0), 0),
     },
     {
-      label: "Silent breaks caught",
+      label: "silent breaks caught",
+      cls: "stat-silent",
       value: sorted.reduce((acc, r) => acc + num(r.findings?.bySeverity?.silent), 0),
     },
   ];
@@ -99,43 +102,36 @@ export function RunsPage() {
 
       {error ? (
         <div
-          className="card"
+          className="banner"
           role="alert"
-          style={{ borderLeft: "3px solid var(--bad, #B3261E)", marginBottom: 16 }}
         >
           Can&apos;t read the ledger folder: <span className="muted">{error}</span>
         </div>
       ) : null}
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: 8,
-          marginBottom: 16,
-        }}
-      >
+      <main>
+      <section className="stats" aria-label="Summary">
         {stats.map((s) => (
-          <div key={s.label} className="card" style={{ margin: 0, padding: 12 }}>
-            <div style={{ fontSize: "1.6rem", fontWeight: 700, lineHeight: 1.2 }}>{s.value}</div>
-            <div className="muted" style={{ fontSize: "0.85rem" }}>
-              {s.label}
-            </div>
+          <div key={s.label} className={`stat${s.cls ? ` ${s.cls}` : ""}`}>
+            <span className="stat-n">{s.value}</span>
+            <span className="stat-l">{s.label}</span>
           </div>
         ))}
-      </div>
+      </section>
+      <h2 className="list-h">Runs</h2>
 
       {runs && sorted.length === 0 ? (
-        <p className="muted" style={{ margin: "24px 0" }}>
+        <p className="muted empty">
           {EMPTY_COPY}
         </p>
       ) : null}
 
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      <div className="run-list">
         {sorted.map((r) => (
           <RunCard key={r.runId} run={r} />
         ))}
       </div>
+      </main>
     </div>
   );
 }

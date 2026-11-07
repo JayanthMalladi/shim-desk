@@ -1,40 +1,54 @@
 import type { ShimDeskRun } from "../types";
-import { relTime } from "../format";
+import { absTime } from "../format";
+import { Code } from "./Code";
 
-/** Human decisions (02 §5.2 #3, right column). Each shows the question, the
- *  options with the chosen one marked, and "{by} · {rel time}". When there
- *  are none: "No human calls needed". */
-export function DecisionList({ decisions }: { decisions?: ShimDeskRun["decisions"] }) {
+/** Human calls (02 §5.2 #3, right column): the question, the options with the
+ *  chosen one marked, and who made the call and when. A decision recorded
+ *  without a question falls back to the scanner's message for the same rule,
+ *  so the reader still sees what the call was about. */
+export function DecisionList({
+  decisions,
+  findings,
+}: {
+  decisions?: ShimDeskRun["decisions"];
+  findings?: ShimDeskRun["findings"];
+}) {
   const list = decisions ?? [];
 
   return (
-    <section className="card" aria-label="Human decisions">
-      <h3 style={{ marginBottom: 12 }}>Human calls</h3>
+    <section className="card decisions" aria-label="Human decisions">
+      <h2>
+        Human calls <span className="count">{list.length}</span>
+      </h2>
       {list.length === 0 ? (
-        <p className="muted" style={{ marginTop: 0 }}>No human calls needed</p>
+        <p className="muted">No human calls needed</p>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <ol className="dec-list">
           {list.map((d, i) => {
-            const chosen = d.options?.[d.choice];
+            const topic = findings?.items?.find((f) => f.ruleId === d.ruleId)?.message;
             return (
-              <div key={`${d.ruleId}:${i}`} style={{ borderBottom: "1px solid var(--border)", paddingBottom: 12, marginBottom: 0 }}>
-                <div style={{ fontSize: "0.8rem", fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace", color: "var(--muted)" }}>
-                  {d.ruleId}
-                </div>
-                <div style={{ margin: "4px 0 8px" }}>{d.question}</div>
-                <ol style={{ margin: "0 0 4px", paddingLeft: 20, display: "flex", flexDirection: "column", gap: 2, fontSize: "0.9rem" }}>
-                  {(d.options ?? []).map((opt, j) => (
-                    <li key={j} style={j === d.choice ? { fontWeight: 700 } : undefined}>
-                      {j === d.choice ? "✓ " : ""}{opt}
-                    </li>
-                  ))}
-                </ol>
-                {chosen !== undefined ? <div style={{ fontSize: "0.85rem" }}>Call: <strong>{chosen}</strong></div> : null}
-                <div style={{ fontSize: "0.8rem", color: "var(--muted)" }}>{d.by} · {relTime(d.at)}</div>
-              </div>
+              <li key={`${d.ruleId}:${i}`} className="dec">
+                <p className="mono dec-rule">{d.ruleId}</p>
+                <p className="dec-q">{d.question ? d.question : <Code text={topic} />}</p>
+                {d.options?.length ? (
+                  <ul className="dec-opts">
+                    {d.options.map((opt, j) => (
+                      <li key={j} className={j === d.choice ? "chosen" : undefined}>
+                        {j === d.choice ? <span aria-hidden="true">✓ </span> : null}
+                        {opt}
+                        {j === d.choice ? <span className="sr"> (chosen)</span> : null}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                <p className="dec-by">
+                  <span className="who who-person">{d.by}</span> <span className="role">person</span>{" "}
+                  <time dateTime={d.at}>{absTime(d.at)}</time>
+                </p>
+              </li>
             );
           })}
-        </div>
+        </ol>
       )}
     </section>
   );

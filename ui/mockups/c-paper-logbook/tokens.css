@@ -1,0 +1,25 @@
+/* C. Paper logbook in the getshim.dev brand: warm paper, ink outlines, offset
+   shadows, Bricolage Grotesque heads, the #FFD84D yellow kept for people only. */
+:root {
+  --bg: #FBF8EF; --surface: #FFFFFF; --border: #111111; --rule: #E7E1CF; --track: #EFE9D8;
+  --text: #111111; --muted: #57534A; --accent: #111111; --focus: #FF6B3D;
+  --ok: #17734E; --ok-bg: #BDF2E6; --warn: #8A5300; --bad: #B4321F; --silent: #6E3FB0; --silent-bg: #F3EEFB;
+  --human: #111111; --human-mark: #FFD84D; --on-human: #111111; --agent: #0E6A5A; --agent-bg: #E3F6F1;
+  --shadow: 4px 4px 0 #111111;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-head: "Bricolage Grotesque", system-ui, sans-serif; --head-weight: 650;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --fs-xs: 12px; --fs-sm: 13.5px; --fs-body: 15px; --fs-md: 19px; --fs-lg: 20px; --fs-xl: 30px; --fs-stat: 40px;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 56px;
+  --radius: 14px; --max: 1080px; --gutter: 24px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161512; --surface: #1F1D19; --border: #E9E2CC; --rule: #34302A; --track: #2E2A24;
+    --text: #F3EEDF; --muted: #B5AE9C; --accent: #F3EEDF; --focus: #FF8A63;
+    --ok: #6EDDB4; --ok-bg: #173229; --warn: #F2B544; --bad: #FF8F7E; --silent: #C6A9F5; --silent-bg: #2A2236;
+    --human: #FFD84D; --human-mark: #FFD84D; --on-human: #111111; --agent: #7DE2D1; --agent-bg: #18302B;
+    --shadow: 4px 4px 0 #000000;
+  }
+}
+@media (max-width: 600px) { :root { --gutter: 16px; } }

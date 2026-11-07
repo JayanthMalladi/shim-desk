@@ -1,67 +1,55 @@
-import {
-  STAGE_LABELS,
-  stageStates,
-  stageTimestamps,
-  pillText,
-  absTime,
-  type RunEvent,
-} from "../format";
+import { STAGE_LABELS, stageStates, stageTimestamps, pillText, absTime, type RunEvent } from "../format";
 
 interface StageTrackProps {
   /** Ledger `status`. */
   status: string;
-  /** Ledger `events` (for per-stage timestamps + terminal row recovery). */
+  /** Ledger `events` (per-stage timestamps + terminal row recovery). */
   events?: RunEvent[];
-  /** "full" = 9 labeled stages; "compact" = one line of dots. */
+  /** Times the ledger stores outside events: the last human call and the approval. */
+  decidedAt?: string;
+  approvedAt?: string;
+  /** "full" = 9 labelled stages with times; "compact" = one line of boxes. */
   variant?: "full" | "compact";
 }
 
-/** The pipeline progress track (02 §5.2 #2).
- *  - Full: 9 labeled stages in order Requested → … → PR. Completed = --ok,
- *    current = --accent (or --warn when waiting on a human), future hollow,
- *    stopped (blocked/failed) = a hollow current-hollow marker.
- *  - Each stage shows its timestamp from `events` on hover and on focus
- *    (via the `title` attribute and `aria-label`).
- *  - Compact: a single line of dots, no labels.
- *  States are exposed via `data-state` so the CSS colors the markers. */
-export function StageTrack({ status, events, variant = "full" }: StageTrackProps) {
+const TIME = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
+
+/** The pipeline track (02 §5.2 #2): stamped boxes in order Requested → … → PR.
+ *  Done = ticked, current = accent, waiting on a human = warn, stopped =
+ *  hollow warn, future = empty. The state is also in text (screen readers
+ *  and the hover/focus title). */
+export function StageTrack({ status, events, decidedAt, approvedAt, variant = "full" }: StageTrackProps) {
   const states = stageStates(status, events);
   const stamps = stageTimestamps(events);
+  stamps[2] = stamps[2] ?? decidedAt ?? null;
+  stamps[7] = stamps[7] ?? approvedAt ?? null;
   const compact = variant === "compact";
 
-  const items = STAGE_LABELS.map((label, i) => {
-    const state = states[i];
-    const ts = stamps[i];
-    const timeLabel = ts ? absTime(ts) : "";
-    const aria: string[] = [label, state];
-    if (timeLabel) aria.push(`(${timeLabel})`);
-    // title is the hover/focus timestamp (02 §5.2 "shows its timestamp on
-    // hover and focus"); empty stages get the stage name only.
-    const title = timeLabel ? `${label} — ${timeLabel}` : label;
-    return (
-      <span
-        key={label}
-        className={`stage-track__item`}
-        data-state={state}
-        aria-label={aria.join(" ")}
-        title={title}
-        tabIndex={0}
-        role="img"
-      >
-        <span className="stage-track__marker" aria-hidden="true" />
-        {!compact ? <span className="stage-track__label">{label}</span> : null}
-      </span>
-    );
-  });
-
   return (
-    <div
-      className={`stage-track${compact ? " compact" : ""}`}
-      role="group"
-      aria-label={`${pillText(status, events)} — stage progress`}
+    <ol
+      className={`track${compact ? " track-compact" : ""}`}
+      aria-label={`${pillText(status, events)}: stage progress`}
     >
-      {items}
-    </div>
+      {STAGE_LABELS.map((label, i) => {
+        const state = states[i];
+        const ts = stamps[i];
+        return (
+          <li
+            key={label}
+            className={`st st-${state}`}
+            tabIndex={compact ? undefined : 0}
+            title={`${label}: ${ts ? absTime(ts) : "time not recorded"}`}
+          >
+            <span className="st-mark" aria-hidden="true">{state === "done" ? "✓" : ""}</span>
+            <span className="st-label">
+              {label}
+              <span className="sr"> ({state})</span>
+            </span>
+            {compact ? null : <span className="st-time">{ts ? TIME.format(new Date(ts)) : " "}</span>}
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 

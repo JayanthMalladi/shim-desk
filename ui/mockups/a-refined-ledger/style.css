@@ -1,0 +1,42 @@
+/* Hallmark · v2.0.0 · shape: app screen · theme: custom, today's ledger tokens · nav: wordmark and one link · footer: none */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R5 V4 · weakest: E, close to today by design; the stage track and the person/agent log carry the change */
+/* Hallmark · dismissed 3 · the silent box is the spec's highlighted top finding, one per page */
+/* A. Refined ledger. Same layout as today: hierarchy, rhythm, the stage track and the log are what change. */
+.card, .stat, .run-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.card { padding: var(--s5); }
+.stat { padding: var(--s4) var(--s5); }
+.stat-n { font-size: var(--fs-stat); font-weight: 650; }
+.stat-l { color: var(--muted); font-size: var(--fs-sm); }
+.stat-silent .stat-n { color: var(--silent); }
+.stat-human .stat-n { color: var(--human); }
+.run-card { padding: var(--s4) var(--s5); transition: border-color 120ms ease, transform 120ms ease; }
+.run-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.rc-id { font-weight: 600; }
+.rc-repo { font-weight: 600; }
+.chips li { font-size: var(--fs-sm); padding: 2px var(--s3); border: 1px solid var(--border); border-radius: 999px; color: var(--muted); }
+.chips .chip-silent { color: var(--silent); border-color: currentColor; }
+.chips .chip-human { color: var(--human); border-color: currentColor; }
+.chips .chip-ok, .chips .chip-pr { color: var(--ok); border-color: currentColor; }
+
+.pill { font-size: var(--fs-sm); font-weight: 600; padding: 2px var(--s3); border-radius: 999px; border: 1px solid currentColor; }
+.pill-ok { color: var(--ok); background: var(--ok-bg); } .pill-warn { color: var(--warn); } .pill-bad { color: var(--bad); } .pill-accent { color: var(--accent); }
+.story { font-size: var(--fs-md); margin-top: var(--s2); }
+
+/* Stage track: a connected line, ticks in circles, times under labels. */
+.track { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--s5) var(--s4) var(--s4); }
+.st-mark { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface); font-size: 12px; font-weight: 700; color: var(--surface); }
+.st-done .st-mark { background: var(--ok); border-color: var(--ok); }
+.st:not(:last-child)::after { content: ""; position: absolute; top: 10px; left: calc(50% + 11px); right: calc(-50% + 11px); height: 2px; background: var(--border); }
+.st-done:not(:last-child)::after { background: var(--ok); }
+.track-compact { background: none; border: 0; padding: 0; }
+.track-compact .st-label { display: none; }
+.track-compact .st-mark { width: 14px; height: 14px; font-size: 0; }
+.track-compact .st:not(:last-child)::after { top: 6px; left: calc(50% + 7px); right: calc(-50% + 7px); }
+
+.top-silent { border-radius: 0 var(--radius) var(--radius) 0; }
+.fix { border: 1px solid var(--border); border-radius: var(--radius); padding: var(--s3) var(--s4); box-shadow: inset 3px 0 0 var(--ok); }
+.ev-person .ev-text { font-weight: 600; }
+@media (max-width: 760px) {
+  .track { padding: var(--s4); }
+  .st:not(:last-child)::after { display: none; }
+}
