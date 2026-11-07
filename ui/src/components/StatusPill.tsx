@@ -8,20 +8,11 @@ interface StatusPillProps {
   className?: string;
 }
 
-/** Renders a status pill. The text is always shown — never color alone
- *  (02 §4 a11y: "every status shown by text as well as color"). The color
- *  token becomes a modifier class (`.status-pill.accent` etc.) that adds a
- *  subtle tint, so color is a redundant cue on top of the label. */
+/** A status pill. The text is always shown, never colour alone (02 §4). */
 export function StatusPill({ status, events, className }: StatusPillProps) {
   const text = pillText(status, events);
-  const color = pillColor(status, events);
-  const cls = ["status-pill", color, className].filter(Boolean).join(" ");
-  return (
-    <span className={cls} title={text}>
-      <span className="dot" aria-hidden="true" />
-      {text}
-    </span>
-  );
+  const cls = ["pill", `pill-${pillColor(status, events)}`, className].filter(Boolean).join(" ");
+  return <span className={cls}>{text}</span>;
 }
 
 export default StatusPill;

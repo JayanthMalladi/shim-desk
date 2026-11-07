@@ -142,7 +142,7 @@ describe("RunCard (02 §5.1)", () => {
     expect(html).toContain("JayanthMalladi/shim-demo-app");
     expect(html).toContain("32 findings");
     expect(html).toContain("18 silent");
-    expect(html).toContain("2 decisions");
+    expect(html).toContain("2 human calls");
     expect(html).toContain("gates 4/4");
     expect(html).toContain("href=\"#/run/r-0000\"");
     expect(html).toContain("https://github.com/JayanthMalladi/shim-demo-app/pull/1");

@@ -1,13 +1,10 @@
 import { useState } from "react";
 import type { ShimDeskRun } from "../types";
-import { severityLabel, severityColor } from "../format";
-
-const num = (v: unknown): number => (typeof v === "number" ? v : 0);
+import { severityLabel } from "../format";
 
 /** Collapsible full findings list (02 §5.2 #3). Collapsed by default; every
- *  item shows file, line, severity, fix, rule, and the message truncated to
- *  one line (full text in a `title` attribute). The table scrolls inside its
- *  own `.table-scroll` container on narrow screens (02 §4). */
+ *  item shows file, line, severity, fix, rule, and the message on one line
+ *  (full text in `title`). Scrolls inside its own container when narrow. */
 export function FindingsTable({ findings }: { findings?: ShimDeskRun["findings"] }) {
   const [open, setOpen] = useState(false);
   const items = findings?.items ?? [];
@@ -15,18 +12,13 @@ export function FindingsTable({ findings }: { findings?: ShimDeskRun["findings"]
   if (items.length === 0) return null;
 
   return (
-    <section className="card" aria-label="All findings">
-      <button
-        className="section-toggle"
-        type="button"
-        aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
-      >
-        {open ? "−" : "+"} All findings ({items.length})
+    <div className="all-findings" aria-label="All findings">
+      <button className="section-toggle" type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        <span aria-hidden="true">{open ? "−" : "+"}</span> All findings ({items.length})
       </button>
       {open ? (
-        <div className="table-scroll" style={{ margin: "8px 0" }}>
-          <table className="table">
+        <div className="table-wrap">
+          <table>
             <thead>
               <tr>
                 <th>File</th>
@@ -43,21 +35,11 @@ export function FindingsTable({ findings }: { findings?: ShimDeskRun["findings"]
                   <td className="mono">{f.file}</td>
                   <td>{f.line}</td>
                   <td>
-                    <span style={{ color: `var(--${severityColor(f.severity)}, var(--muted))` }}>
-                      {severityLabel(f.severity)}
-                    </span>
+                    <span className={`sev-tag-${f.severity}`}>{severityLabel(f.severity)}</span>
                   </td>
                   <td>{f.fix}</td>
                   <td className="mono">{f.ruleId}</td>
-                  <td
-                    style={{
-                      maxWidth: 280,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                    title={f.message}
-                  >
+                  <td className="msg" title={f.message}>
                     {f.message}
                   </td>
                 </tr>
@@ -66,7 +48,7 @@ export function FindingsTable({ findings }: { findings?: ShimDeskRun["findings"]
           </table>
         </div>
       ) : null}
-    </section>
+    </div>
   );
 }
 

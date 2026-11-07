@@ -3,6 +3,8 @@ import type { ShimDeskRun } from "../types";
 import { getRun } from "../data";
 import { Header } from "../components/Header";
 import { StageTrack } from "../components/StageTrack";
+import { StatusPill } from "../components/StatusPill";
+import { absTime } from "../format";
 import { FindingsSummary } from "../components/FindingsSummary";
 import { FindingsTable } from "../components/FindingsTable";
 import { DecisionList } from "../components/DecisionList";
@@ -25,95 +27,115 @@ interface RunPageProps {
   run?: ShimDeskRun;
 }
 
-/** The top-to-bottom section layout (02 §5.2 #2–#8). */
+const num = (v: unknown): number => (typeof v === "number" ? v : 0);
+
+/** One sentence that says what happened, built only from the ledger. */
+function StoryLine({ run }: { run: ShimDeskRun }) {
+  const f = run.findings;
+  if (!f) return null;
+  const baseline = run.gates?.baseline ?? {};
+  const after = run.gates?.after ?? {};
+  const held = Object.keys(baseline).filter((k) => baseline[k] === true);
+  const still = held.filter((k) => after[k] === true).length;
+  const calls = run.decisions?.length ?? 0;
+  return (
+    <p className="story">
+      Shim found <strong>{num(f.total)} changes</strong> in {num(f.files)} files,{" "}
+      <strong className="t-silent">{num(f.bySeverity?.silent)} of them silent</strong>.{" "}
+      {calls ? (
+        <>
+          People made <strong className="t-human">{calls} {calls === 1 ? "call" : "calls"}</strong>
+          {run.approval ? " and approved the PR" : ""}; agents did the rest.{" "}
+        </>
+      ) : null}
+      {held.length && run.gates?.after ? (
+        <>
+          <strong className="t-ok">
+            {still} of {held.length}
+          </strong>{" "}
+          baseline gates still pass.
+        </>
+      ) : null}
+    </p>
+  );
+}
+
+/** The top-to-bottom section layout (02 §5.2 #1-#8). */
 function RunDetail({ run }: { run: ShimDeskRun }) {
   const stopped = run.status === "blocked" || run.status === "failed";
+  const decisions = run.decisions ?? [];
 
   return (
     <div className="page">
-      {/* Sticky "← All runs" link at the top. */}
-      <a
-        href="#/"
-        style={{
-          position: "sticky",
-          top: 0,
-          display: "inline-block",
-          background: "var(--bg, #FAFAF7)",
-          padding: "4px 0",
-          marginBottom: 8,
-          zIndex: 1,
-        }}
-      >
-        ← All runs
-      </a>
+      <Header />
+      <main>
+        <a className="back" href="#/">
+          ← All runs
+        </a>
 
-      {/* #1 Title row: runId · repo (linked) · StatusPill · requested-by line. */}
-      <Header
-        runId={run.runId}
-        repo={run.repo}
-        status={run.status}
-        events={run.events}
-        requestedBy={run.requestedBy}
-        createdAt={run.createdAt}
-      />
+        {/* #1 Title row. */}
+        <header className="title">
+          <div className="title-row">
+            <h1>
+              <span className="mono">{run.runId}</span>{" "}
+              <a href={`https://github.com/${run.repo}`} target="_blank" rel="noreferrer">
+                {run.repo}
+              </a>
+            </h1>
+            <StatusPill status={run.status} events={run.events} />
+          </div>
+          <p className="requested">
+            Requested by <span className="who who-person">{run.requestedBy}</span>
+            {run.room ? ` in ~${run.room}` : ""}, <time dateTime={run.createdAt}>{absTime(run.createdAt)}</time>.
+          </p>
+          <StoryLine run={run} />
+        </header>
 
-      {/* Blocked / failed: a banner with the status reason. */}
-      {stopped ? (
+        {stopped ? (
+          <div className="banner" role="alert">
+            <strong>{run.status === "blocked" ? "Run blocked" : "Run failed"}</strong>
+            {run.statusReason ? <p>{run.statusReason}</p> : null}
+          </div>
+        ) : null}
+
+        {/* #2 Full stage track. */}
+        <StageTrack
+          status={run.status}
+          events={run.events}
+          decidedAt={decisions.length ? decisions[decisions.length - 1].at : undefined}
+          approvedAt={run.approval?.at}
+          variant="full"
+        />
+
+        {/* #3 Findings (left) and human calls (right); one column under ~760px. */}
         <div
-          className="card"
-          role="alert"
-          style={{
-            borderLeft: "3px solid var(--bad, #B3261E)",
-            background: "color-mix(in srgb, var(--bad, #B3261E) 8%, var(--surface))",
-            marginBottom: 16,
-          }}
+          className="run-detail-grid"
+          style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(340px, 100%), 1fr))", gap: "var(--s4)", alignItems: "start" }}
         >
-          <strong>
-            {run.status === "blocked" ? "Run blocked" : "Run failed"}
-          </strong>
-          {run.statusReason ? <div>{run.statusReason}</div> : null}
+          <section className="card findings" style={{ minWidth: 0 }}>
+            <FindingsSummary findings={run.findings} />
+            <FindingsTable findings={run.findings} />
+          </section>
+          <div style={{ minWidth: 0 }}>
+            <DecisionList decisions={run.decisions} findings={run.findings} />
+          </div>
         </div>
-      ) : null}
 
-      {/* #2 Full stage track (9 labeled stages). */}
-      <div className="card">
-        <StageTrack status={run.status} events={run.events} variant="full" />
-      </div>
+        {/* #4 Parallel fixes. */}
+        <FixGrid run={run} />
 
-      {/* #3 Two-column grid: left = findings summary + table, right = decisions.
-          Two columns above ~760px, one below (min 340px capped at the
-          container width so 375px never overflows). */}
-      <div
-        className="run-detail-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(min(340px, 100%), 1fr))",
-          gap: 16,
-        }}
-      >
-        <div className="run-detail-left" style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          <FindingsSummary findings={run.findings} />
-          <FindingsTable findings={run.findings} />
+        {/* #5 Gates and #6 review side by side. */}
+        <div className="grid2">
+          <GatesTable gates={run.gates} />
+          <ReviewCard review={run.review} />
         </div>
-        <div className="run-detail-right" style={{ minWidth: 0 }}>
-          <DecisionList decisions={run.decisions} />
-        </div>
-      </div>
 
-      {/* #4 Parallel fixes. */}
-      <FixGrid run={run} />
+        {/* #7 Pull request. */}
+        <PrCard run={run} />
 
-      {/* #5 Gates baseline vs after. */}
-      <GatesTable gates={run.gates} />
-
-      {/* #6 Review. */}
-      <ReviewCard review={run.review} />
-
-      {/* #7 Pull request. */}
-      <PrCard run={run} />
-
-      {/* #8 Timeline (events, oldest first). */}
-      <Timeline events={run.events} />
+        {/* #8 Signed log. */}
+        <Timeline run={run} />
+      </main>
     </div>
   );
 }
@@ -149,7 +171,7 @@ export function RunPage({ runId, run }: RunPageProps) {
   if (loading) {
     return (
       <div className="page">
-        <a href="#/">← All runs</a>
+        <a className="back" href="#/">← All runs</a>
         <p className="muted">Loading run…</p>
       </div>
     );
@@ -157,7 +179,7 @@ export function RunPage({ runId, run }: RunPageProps) {
   if (error) {
     return (
       <div className="page">
-        <a href="#/">← All runs</a>
+        <a className="back" href="#/">← All runs</a>
         <div className="card" role="alert" style={{ borderLeft: "3px solid var(--bad, #B3261E)" }}>
           Can&apos;t read this run: <span className="muted">{error}</span>
         </div>
@@ -167,7 +189,7 @@ export function RunPage({ runId, run }: RunPageProps) {
   if (!data) {
     return (
       <div className="page">
-        <a href="#/">← All runs</a>
+        <a className="back" href="#/">← All runs</a>
         <p className="muted">No such run.</p>
       </div>
     );

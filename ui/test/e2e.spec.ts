@@ -88,7 +88,7 @@ if (IS_VITEST) {
   // matches exactly.
   const stripValue = async (page: Page, label: string): Promise<number> => {
     const text = await page
-      .locator(`.card:has(> .muted:text-is("${label}")) > div:first-child`)
+      .locator(`.stat:has(> .stat-l:text-is("${label}")) > .stat-n`)
       .innerText();
     return Number(text);
   };
@@ -120,10 +120,10 @@ if (IS_VITEST) {
       silent: realRun.findings?.bySeverity?.silent ?? 0,
     };
     await expect
-      .poll(async () => await stripValue(page, 'Runs')).toBe(expected.runs);
+      .poll(async () => await stripValue(page, 'run')).toBe(expected.runs);
     expect(await stripValue(page, 'PRs opened')).toBe(expected.prs);
-    expect(await stripValue(page, 'Human decisions')).toBe(expected.decisions);
-    expect(await stripValue(page, 'Silent breaks caught')).toBe(expected.silent);
+    expect(await stripValue(page, 'human calls')).toBe(expected.decisions);
+    expect(await stripValue(page, 'silent breaks caught')).toBe(expected.silent);
 
     // b. Click the card's stretched link (an <a> filling the whole card,
     //    02 §5.1 "the whole card links to #/run/<runId>") → #/run/r-0001.
