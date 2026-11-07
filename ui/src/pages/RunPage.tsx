@@ -171,6 +171,7 @@ export function RunPage({ runId, run }: RunPageProps) {
   if (loading) {
     return (
       <div className="page">
+        <Header />
         <a className="back" href="#/">← All runs</a>
         <p className="muted">Loading run…</p>
       </div>
@@ -179,6 +180,7 @@ export function RunPage({ runId, run }: RunPageProps) {
   if (error) {
     return (
       <div className="page">
+        <Header />
         <a className="back" href="#/">← All runs</a>
         <div className="card" role="alert" style={{ borderLeft: "3px solid var(--bad, #B3261E)" }}>
           Can&apos;t read this run: <span className="muted">{error}</span>
@@ -189,6 +191,7 @@ export function RunPage({ runId, run }: RunPageProps) {
   if (!data) {
     return (
       <div className="page">
+        <Header />
         <a className="back" href="#/">← All runs</a>
         <p className="muted">No such run.</p>
       </div>
