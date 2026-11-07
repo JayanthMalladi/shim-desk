@@ -11,5 +11,9 @@
     "ui": "npm --prefix ui run dev",
     "ui:build": "npm --prefix ui run build",
     "setup": "node scripts/doctor.mjs && npm --prefix ui install"
+  },
+  "devDependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
   }
 }

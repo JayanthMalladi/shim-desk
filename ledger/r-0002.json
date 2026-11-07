@@ -1,0 +1,280 @@
+{
+  "runId": "r-0002",
+  "repo": "JayanthMalladi/shim-demo-app",
+  "migration": "ai-sdk-v7",
+  "requestedBy": "Jayanth",
+  "room": "shim-desk",
+  "createdAt": "2026-11-07T06:41:22.693Z",
+  "updatedAt": "2026-11-07T07:09:30.337Z",
+  "status": "done",
+  "events": [
+    {
+      "t": "2026-11-07T06:41:22.693Z",
+      "kind": "status",
+      "status": "requested"
+    },
+    {
+      "t": "2026-11-07T06:41:46.207Z",
+      "kind": "status",
+      "status": "cloning"
+    },
+    {
+      "t": "2026-11-07T06:41:46.260Z",
+      "kind": "status",
+      "status": "scanned"
+    },
+    {
+      "t": "2026-11-07T06:41:46.314Z",
+      "kind": "status",
+      "status": "awaiting_decision"
+    },
+    {
+      "t": "2026-11-07T06:41:55.916Z",
+      "kind": "status",
+      "status": "fixing_deterministic"
+    },
+    {
+      "t": "2026-11-07T06:53:06.331Z",
+      "kind": "gate",
+      "actor": "shim-lead.jayanth",
+      "text": "Shim applied 12 deterministic fixes"
+    },
+    {
+      "t": "2026-11-07T06:53:06.577Z",
+      "kind": "status",
+      "status": "fixing_parallel"
+    },
+    {
+      "t": "2026-11-07T06:53:15.617Z",
+      "kind": "fix",
+      "actor": "shim-fixer:src/typed.ts",
+      "status": "done",
+      "text": "Switched all result reads to finalStep.* to keep v6 last-step semantics"
+    },
+    {
+      "t": "2026-11-07T06:53:15.869Z",
+      "kind": "fix",
+      "actor": "shim-fixer:src/billing.ts",
+      "status": "done",
+      "text": "Read result.finalStep.usage to keep v6 single-step billing"
+    },
+    {
+      "t": "2026-11-07T06:53:15.967Z",
+      "kind": "fix",
+      "actor": "shim-fixer:src/messages.ts",
+      "status": "done",
+      "text": "allowSystemInMessages:true at viaSpread (the authorized finding)"
+    },
+    {
+      "t": "2026-11-07T06:53:16.057Z",
+      "kind": "fix",
+      "actor": "shim-fixer:src/legacy.cjs",
+      "status": "done",
+      "text": "Converted to ESM (legacy.mjs, import from ai)"
+    },
+    {
+      "t": "2026-11-07T06:53:16.135Z",
+      "kind": "fix",
+      "actor": "shim-fixer:src/agent.ts",
+      "status": "done",
+      "text": "finalStep reads, allowSystemInMessages, otel telemetry registered; typecheck passes"
+    },
+    {
+      "t": "2026-11-07T06:53:16.220Z",
+      "kind": "fix",
+      "actor": "shim-fixer:src/tools.ts",
+      "status": "done",
+      "text": "Added the required context field to both tool-call option literals (type-only)"
+    },
+    {
+      "t": "2026-11-07T06:57:29.222Z",
+      "kind": "status",
+      "status": "gating"
+    },
+    {
+      "t": "2026-11-07T06:57:29.470Z",
+      "kind": "status",
+      "status": "in_review"
+    },
+    {
+      "t": "2026-11-07T06:57:29.555Z",
+      "kind": "review",
+      "actor": "shim-reviewer.jayanth",
+      "text": "changes:round 1: verify every changed line traces to a finding or decision"
+    },
+    {
+      "t": "2026-11-07T06:57:29.689Z",
+      "kind": "review",
+      "actor": "shim-reviewer.jayanth",
+      "text": "approve:round 2: all v6 semantics preserved via finalStep reads; no signature changes; approve"
+    },
+    {
+      "t": "2026-11-07T06:57:41.068Z",
+      "kind": "status",
+      "status": "awaiting_approval"
+    },
+    {
+      "t": "2026-11-07T06:57:41.406Z",
+      "kind": "approval",
+      "actor": "shim-lead.jayanth",
+      "text": "PR approved by Jayanth"
+    },
+    {
+      "t": "2026-11-07T06:57:59.572Z",
+      "kind": "status",
+      "status": "awaiting_approval"
+    },
+    {
+      "t": "2026-11-07T06:57:59.672Z",
+      "kind": "approval",
+      "actor": "shim-lead.jayanth",
+      "text": "PR approved by Jayanth"
+    },
+    {
+      "t": "2026-11-07T07:00:09.920Z",
+      "kind": "status",
+      "status": "opening_pr"
+    },
+    {
+      "t": "2026-11-07T07:09:30.207Z",
+      "kind": "pr",
+      "actor": "shim-lead.jayanth",
+      "text": "https://github.com/JayanthMalladi/shim-demo-app/pull/2",
+      "branch": "shim/ai-sdk-7-r-0002"
+    },
+    {
+      "t": "2026-11-07T07:09:30.278Z",
+      "kind": "status",
+      "status": "done"
+    },
+    {
+      "t": "2026-11-07T07:09:30.337Z",
+      "kind": "message",
+      "actor": "shim-lead.jayanth",
+      "text": "PR opened: https://github.com/JayanthMalladi/shim-demo-app/pull/2. Run r-0002 logged in the ledger."
+    }
+  ],
+  "decisions": [
+    {
+      "ruleId": "node-22",
+      "question": "engines.node is >=18 but AI SDK 7 needs 22",
+      "options": [],
+      "choice": 1,
+      "by": "Jayanth",
+      "at": "2026-11-07T06:41:46.365Z"
+    },
+    {
+      "ruleId": "telemetry-needs-otel",
+      "question": "telemetry moved to @ai-sdk/otel",
+      "options": [],
+      "choice": 1,
+      "by": "Jayanth",
+      "at": "2026-11-07T06:41:46.442Z"
+    }
+  ],
+  "autoFixed": 12,
+  "fixes": [
+    {
+      "file": "src/typed.ts",
+      "status": "done",
+      "summary": "Switched all result reads to finalStep.* to keep v6 last-step semantics",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "file": "src/billing.ts",
+      "status": "done",
+      "summary": "Read result.finalStep.usage to keep v6 single-step billing",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "file": "src/messages.ts",
+      "status": "done",
+      "summary": "allowSystemInMessages:true at viaSpread (the authorized finding)",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "file": "src/legacy.cjs",
+      "status": "done",
+      "summary": "Converted to ESM (legacy.mjs, import from ai)",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "file": "src/agent.ts",
+      "status": "done",
+      "summary": "finalStep reads, allowSystemInMessages, otel telemetry registered; typecheck passes",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "file": "src/tools.ts",
+      "status": "done",
+      "summary": "Added the required context field to both tool-call option literals (type-only)",
+      "agent": "shim-fixer",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "gates": {
+    "baseline": {
+      "install": true,
+      "typecheck .": true,
+      "test .": true
+    },
+    "after": {
+      "install": true,
+      "build": true,
+      "typecheck .": true,
+      "test .": true
+    },
+    "regressions": [],
+    "detail": {
+      "install": {
+        "ok": true,
+        "code": 0,
+        "ms": 4888,
+        "tail": "\nup to date, audited 65 packages in 4s\n\n16 packages are looking for funding\n  run `npm fund` for details\n\n3 vulnerabilities (1 moderate, 2 critical)\n\nTo address all issues (including breaking changes), run:\n  npm audit fix --force\n\nRun `npm audit` for details.\n"
+      },
+      "build": {
+        "ok": true,
+        "code": null,
+        "ms": 0,
+        "tail": "skipped"
+      },
+      "typecheck .": {
+        "ok": true,
+        "code": 0,
+        "ms": 1845,
+        "tail": "\n> shim-demo-app@0.1.0 typecheck\n> tsc --noEmit\n\n"
+      },
+      "test .": {
+        "ok": true,
+        "code": 0,
+        "ms": 2439,
+        "tail": "\n> shim-demo-app@0.1.0 test\n> vitest run\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mD:/shim-desk/work/r-0002/shim-demo-app\u001b[39m\n\n \u001b[32m✓\u001b[39m tests/billing.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 10\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m   Start at \u001b[22m 12:27:19\n\u001b[2m   Duration \u001b[22m 1.01s\u001b[2m (transform 151ms, setup 0ms, collect 197ms, tests 10ms, environment 0ms, prepare 261ms)\u001b[22m\n\n"
+      }
+    }
+  },
+  "review": {
+    "verdict": "approve",
+    "by": "shim-reviewer.jayanth",
+    "notes": [
+      "round 1: verify every changed line traces to a finding or decision",
+      "round 2: all v6 semantics preserved via finalStep reads; no signature changes; approve"
+    ],
+    "rounds": 2
+  },
+  "approval": {
+    "by": "Jayanth",
+    "at": "2026-11-07T06:57:59.672Z"
+  },
+  "pr": {
+    "url": "https://github.com/JayanthMalladi/shim-demo-app/pull/2",
+    "branch": "shim/ai-sdk-7-r-0002",
+    "filesChanged": 10,
+    "additions": 208,
+    "deletions": 207
+  }
+}

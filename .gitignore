@@ -3,4 +3,5 @@ node_modules/
 work/
 .switch/
 ui/dist/
+ui/test-results/
 *.log

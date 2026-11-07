@@ -1,6 +1,6 @@
 # Shim Desk — Build Status & What We Built
 
-**As of:** 2026-11-06 ~09:40 UTC · **Status:** everything that can be *built* is done, committed, and the workflow has run end-to-end once for real. Only **WP-J** (record the video + submit the form) remains.
+**As of:** 2026-11-07 ~07:15 UTC · **Status:** everything that can be *built* is done, committed, and the workflow has run end-to-end **twice** for real (r-0001, and the r-0002 live confirmation that the completed ledger writer fills the board with no manual reconcile — §5.1). Only **WP-J** (record the video + submit the form) remains.
 **Deadline:** 2026-11-07 18:29 UTC (~33 h of buffer).
 
 ---
@@ -40,7 +40,7 @@ Deterministic steps the lead agent calls. All cross-platform safe (`path.join`, 
 | `ledger.mjs` | Read/patch `ledger/<id>.json` **atomically** (same-dir temp + rename) so the board never reads a half-file |
 | `doctor.mjs` | Environment check (node/git/gh/docker/claude/getshim), ✅/❌ table, exit 1 on any ❌ |
 
-**Tests:** `test/{findings,plan-fixes,ledger,render}.test.mjs` — **`npm test` = 45/45 passing.** The findings parser is verified against a captured `getshim` fixture (32 findings / 5 files).
+**Tests:** `test/{findings,plan-fixes,ledger,render}.test.mjs` — **`npm test` = 53/53 passing** (+8 ledger tests: one per new flag, a git-fixture diffstat test, and the r-0001 e2e replay that deep-equals the committed `ledger/r-0001.json` and validates against `ledger/schema.json` via ajv draft-2020). The findings parser is verified against a captured `getshim` fixture (32 findings / 5 files).
 
 ### 2.2 Runtime skills — `.claude/skills/` (3, loaded by the Switch agents from the working dir)
 - **`shim-upgrade`** — the lead's end-to-end procedure (preconditions → new-run → scan → human decisions → deterministic pass → parallel fix → gates → review hand-off → approval → PR), with the "Never" list.
@@ -125,8 +125,8 @@ AI SDK 6 app with green typecheck+tests at baseline (`v6-baseline`) and seeded f
 
 ## 5. Deviations, known issues, and risks
 
-### 5.1 Ledger `r-0001` was under-populated, then reconciled
-The lead's `ledger.mjs` wrote status/decisions/gates but not the derived fields (`fixes[]`, `autoFixed`, `approval`, `pr` counts, event `actor`), so the board would have shown "0 files fixed." Fixed by an atomic same-dir reconcile with **all values sourced from the real artifacts** (`report.json`, the room's PROGRESS lines, GitHub), re-validated against the schema. *This is a process gap worth knowing: the spec's writer is thin for the "done" fields; the board depends on them.*
+### 5.1 Ledger `r-0001` was under-populated, then reconciled — **writer now complete**
+The lead's `ledger.mjs` wrote status/decisions/gates but not the derived fields (`fixes[]`, `autoFixed`, `approval`, `pr` counts, event `actor`), so the board would have shown "0 files fixed." Fixed by an atomic same-dir reconcile with **all values sourced from the real artifacts** (`report.json`, the room's PROGRESS lines, GitHub), re-validated against the schema. **Resolved 2026-11-07:** `ledger.mjs` now writes every field in-run (`--fix`, `--auto-fixed-from`, `--review --by`, `--approval`, `--pr --branch --repo-dir`, `--actor`, `--message`; see `docs/DECISIONS.md`), and a live confirmation run **r-0002** (a fresh reset of `shim-demo-app` on the new base branch `shim-live-base`, not main — PR #2, 10 files +208/−207) filled every board section from its own ledger calls, no hand reconcile. (One `awaiting_approval`/`approval` pair is recorded twice in r-0002's events: a classifier-denied batch was re-run, so the writer faithfully logged two real calls — left in place, not hand-edited.)
 
 ### 5.2 Windows Switch Console can't execute agent sessions locally
 The "single biggest risk" from the spec (01 §6.1) materialized: `switch-console-v0.40.1` on Windows shows "no provider is set up / SDK sessions require a POSIX SSH execution event" at the agent step. A WSL2 remote-host path was built and largely verified, but the **final working configuration is actually the local agent-controller** (`LAPTOP-JUJPFSES` enrolled, Claude Code auth "ok"), so the agents ended up running **locally on this machine** (`D:\shim-desk`). The WSL setup is unused scaffolding. Documented in `DECISIONS.md` + `SWITCH-BLOCKER.md` (upstream issues #1472, #1511).
@@ -162,10 +162,11 @@ The tsconfig `include` stays narrow (billing + messages); the wider coverage + i
 ---
 
 ## 7. Test / evidence summary (all run by the lead, not taken on faith)
-- `npm test` (shim-desk root): **45/45**
+- `npm test` (shim-desk root): **53/53** (45 → 53: 8 new ledger tests)
 - `npm --prefix ui test`: **38/38** · `npm --prefix ui run e2e`: **3/3**
 - `ledger/r-0001.json`: schema-valid (draft-2020)
-- `shim-demo-app` gates: typecheck + test **green**; GitHub CI **green**; acceptance scan passes
-- **PR #1 open** (11 files, +244/−203)
+- **Live run r-0002** (2026-11-07): fresh `shim-demo-app` reset on the `shim-live-base` branch, run the full skill sequence in this session → `ledger/r-0002.json` schema-valid (draft-2020), every board section populated **by the in-run ledger calls, no manual reconcile**; board confirmed live (`/api/runs/r-0002`).
+- `shim-demo-app` gates: typecheck + test **green** (r-0002 after: install/build/typecheck/test all pass, 0 regressions); acceptance scan passes
+- **PR #1 open** (11 files, +244/−203, on `main`) · **PR #2 open** (10 files, +208/−207, on `shim-live-base` — the r-0002 live-run confirmation; not main)
 
 *The build is complete and working end-to-end. The only remaining task is the human recording + submission (WP-J).*

@@ -20,6 +20,7 @@ desk-reporting skill. Never skip a human gate.
 It prints JSON: {"runId":"r-0007","workDir":"work/r-0007"}. Remember both.
     node scripts/clone.mjs --run <runId> --repo <owner/name>
 Post the ACK message.
+    node scripts/ledger.mjs --run <runId> --status cloning
 
 ## 2. Scan (read-only)
     npx -y getshim@0.1.0 scan work/<runId>/<name> > work/<runId>/scan.txt
@@ -27,6 +28,7 @@ Post the ACK message.
 It writes work/<runId>/findings.json and prints a summary JSON. Post the FINDINGS
 message. Explain the single most important silent finding in one plain sentence
 (what changes at runtime, and why tsc misses it).
+    node scripts/ledger.mjs --run <runId> --status scanned
 
 ## 3. Human decisions (gate 1)
 For every finding with fix "manual", and for these known choices, ask a DECISION
@@ -38,6 +40,7 @@ message, one question at a time, with numbered options and your recommendation:
 Wait for the reply. Record each answer:
     node scripts/ledger.mjs --run <runId> --decision <ruleId> --choice <n> --by <handle>
 If nobody answers, do not guess. Wait.
+    node scripts/ledger.mjs --run <runId> --status awaiting_decision
 
 ## 4. Deterministic pass
     npx -y getshim@0.1.0 migrate work/<runId>/<name> --out work/<runId>/shim --repo <owner/name>
@@ -50,6 +53,9 @@ to prove behavior is preserved.
     node scripts/findings.mjs --run <runId> --report work/<runId>/shim/report.json
     node scripts/plan-fixes.mjs --run <runId>
 fix-plan.json groups the remaining findings by file and applies the decisions from step 3.
+Record the deterministic fixes and the status change:
+    node scripts/ledger.mjs --run <runId> --auto-fixed-from work/<runId>/shim/report.json
+    node scripts/ledger.mjs --run <runId> --status fixing_deterministic
 
 ## 5. Parallel fix (subagents)
 Post the FANOUT message. Then, IN ONE TURN, start one shim-fixer subagent per file in
@@ -61,6 +67,9 @@ fix-plan.json, all in parallel. Give each one only:
 Wait for all of them. Each returns a JSON line {file, status, summary}. Post one
 PROGRESS line per file as results arrive. If one returns status "blocked", do not
 retry blindly: put it in the DECISION flow (step 3) or mark it for the PR body.
+Record the status and each shim-fixer result as it lands:
+    node scripts/ledger.mjs --run <runId> --status fixing_parallel
+    node scripts/ledger.mjs --run <runId> --fix <file> --fix-status <done|blocked> --summary "<max 12 words>" --model claude-sonnet-5-5
 
 ## 6. Gates
 Start one gate-runner subagent with the repo root and work/<runId>/shim/report.json.
@@ -70,6 +79,7 @@ shim-fixer for the file the error names, once. If it still fails, post GATES wit
 the failure, write an issue-style summary to work/<runId>/issue.md, set status
 "blocked", and stop. Never open a PR with a regressed gate.
 Post the GATES message.
+    node scripts/ledger.mjs --run <runId> --status gating
 
 ## 7. Review hand-off (in the room)
     git -C work/<runId>/<name> add -A
@@ -77,10 +87,16 @@ Post the GATES message.
 Post the HANDOFF message addressing @shim-reviewer.jayanth. Wait for its VERDICT. If it raises a
 blocking issue, fix it with a shim-fixer, re-run gates, and hand off once more. Max 2
 review rounds, then ask the human.
+Record the hand-off status and each reviewer verdict:
+    node scripts/ledger.mjs --run <runId> --status in_review
+    node scripts/ledger.mjs --run <runId> --review <approve|changes> --by shim-reviewer.jayanth --note "<one line>"
 
 ## 8. Human approval (gate 2)
 Post the APPROVAL message and wait for "approve". Anything else is feedback: apply it,
 re-run gates, ask again.
+Record the gate-2 status, and on "approve" the approval itself:
+    node scripts/ledger.mjs --run <runId> --status awaiting_approval
+    node scripts/ledger.mjs --run <runId> --approval --by <handle>
 
 ## 9. Open the PR (only after "approve")
     git -C work/<runId>/<name> checkout -b shim/ai-sdk-7-<runId>
@@ -89,8 +105,11 @@ re-run gates, ask again.
     gh pr create -R <owner/name> --head shim/ai-sdk-7-<runId> --title "Upgrade to AI SDK 7" --body-file work/<runId>/pr-body.md
 Build pr-body.md from work/<runId>/shim/pr-body.md plus the decisions and the review
 verdict (node scripts/render.mjs --run <runId> --pr-body). Post the DONE message with
-the link.
-    node scripts/ledger.mjs --run <runId> --status done --pr <url>
+the link. Record the status, the PR (with its diffstat from the work clone), and the
+done state:
+    node scripts/ledger.mjs --run <runId> --status opening_pr
+    node scripts/ledger.mjs --run <runId> --pr <url> --branch shim/ai-sdk-7-<runId> --repo-dir work/<runId>/<name>
+    node scripts/ledger.mjs --run <runId> --status done
 Then update the room document "Upgrade ledger" with the LEDGER line.
 
 ## Never
