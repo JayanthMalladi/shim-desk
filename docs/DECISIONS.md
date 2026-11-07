@@ -143,3 +143,6 @@ Jayanth picked direction C from `ui/mockups/` (comparison at `ui/mockups/index.h
 
 ## Board hosted on Vercel; static build data path fixed (02 §8, 2026-11-07)
 Jayanth chose Vercel over GitHub Pages. `vercel.json` at the repo root installs and builds `ui/` and serves `ui/dist`, so importing the repo in Vercel needs no settings. While testing the static build, every page showed "Unexpected token '<'": `data.ts` built data URLs from `document.baseURI`, which keeps the `#/run/...` hash route, so the fetch hit `index.html` instead of `data/*.json` (the same bug affected the Pages build). `base()` now drops the hash and query first. `pages.yml` stays; the README board link moves to the Vercel URL once the project exists.
+
+## GitHub Pages workflow removed (2026-11-07)
+`pages.yml` failed on every push since it was added (`deploy-pages`: 404, Pages was never enabled in the repo settings), which put a red X on each merge. The board is hosted on Vercel now (`vercel.json`), so the workflow is removed rather than enabled.
