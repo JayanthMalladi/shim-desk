@@ -7,7 +7,7 @@
   },
   "scripts": {
     "doctor": "node scripts/doctor.mjs",
-    "test": "node --test",
+    "test": "node --test \"test/**/*.test.mjs\"",
     "ui": "npm --prefix ui run dev",
     "ui:build": "npm --prefix ui run build",
     "setup": "node scripts/doctor.mjs && npm --prefix ui install"

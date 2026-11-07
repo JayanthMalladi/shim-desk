@@ -32,9 +32,13 @@ export default defineConfig({
     },
   ],
   webServer: {
-    // Pinned port + strictPort; reuseExistingServer: true so an already-running
-    // dev server on 5173 is used instead of spawning a second one.
-    command: 'npm --prefix ui run dev -- --port 5173 --strictPort',
+    // Playwright runs this command with cwd = ui/ (the config's directory), so
+    // it must be the in-dir form `npm run dev`, NOT `npm --prefix ui run dev`
+    // (that resolved to ui/ui/ and ENOENT'd on a fresh clone, which had no
+    // pre-running server to reuse). Pinned port + strictPort;
+    // reuseExistingServer: true so an already-running dev server on 5173 is
+    // used instead of spawning a second one.
+    command: 'npm run dev -- --port 5173 --strictPort',
     url: 'http://localhost:5173',
     reuseExistingServer: true,
     timeout: 120_000,

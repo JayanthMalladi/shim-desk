@@ -74,7 +74,7 @@ Because this Windows Console build can't run agent sessions locally, the two age
 ## Ledger board
 
 [The board](https://JayanthMalladi.github.io/shim-desk/) · ![runs](docs/board-runs.png) · ![run](docs/board-run.png)
-Read-only over `ledger/*.json`; the static build on GitHub Pages shows the committed runs (`r-0000` fixture + the real `r-0001`). (URL is live once the repo's Pages source is set to GitHub Actions; the workflow is `.github/workflows/pages.yml`.)
+Read-only over `ledger/*.json`; the board lists only real runs (files named `r-NNNN.json`), so a fresh clone shows the single committed run `r-0001`. `example-r-0000.json` is a test fixture (imported directly by `ui/test/RunPage.test.tsx`) and is never listed. (URL is live once the repo's Pages source is set to GitHub Actions; the workflow is `.github/workflows/pages.yml`.)
 
 ## Built during the hackathon
 

@@ -1,8 +1,12 @@
 // WP UI-4 — Playwright e2e for the Ledger Board (02-UI-SPEC §7 UI-4, §8).
 // Runs against the DEV server (ui/playwright.config.ts webServer: `npm --prefix
 // ui run dev -- --port 5173 --strictPort`, baseURL localhost:5173,
-// reuseExistingServer). The committed fixture ledger/example-r-0000.json
-// (runId r-0000, status done, 16 events, PR url) is what the board shows today.
+// reuseExistingServer).
+//
+// Board listing (02 §1, ui/plugins/ledger.ts): only real runs — files named
+// r-NNNN.json. The committed test fixture ledger/example-r-0000.json is NOT
+// listed (ui/test/RunPage.test.tsx imports it directly), so a fresh clone's
+// board shows exactly one card: r-0001.
 //
 // This file lives in ui/test/ next to the vitest suites (format.test.ts,
 // RunPage.test.tsx), so `npm --prefix ui run test` (bare `vitest run`) also
@@ -17,7 +21,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
-import type { Browser, BrowserContext } from '@playwright/test';
+import type { Browser, BrowserContext, Page } from '@playwright/test';
 
 // ui/ is a "type": "module" package, so this spec loads as ESM and `__dirname`
 // is not in scope.
@@ -79,24 +83,54 @@ if (IS_VITEST) {
     expect(fs.existsSync(LIVE_FILE)).toBe(false);
   });
 
-  // a. + b. Open `/`, see the fixture run card, click into it, see GatesTable.
-  test('board: fixture run card opens into the run with all-pass gates footer', async ({
+  // Summary-strip tile value (02 §5.1): each tile is a .card holding a large
+  // value div then a .muted label. Read the value from the tile whose label
+  // matches exactly.
+  const stripValue = async (page: Page, label: string): Promise<number> => {
+    const text = await page
+      .locator(`.card:has(> .muted:text-is("${label}")) > div:first-child`)
+      .innerText();
+    return Number(text);
+  };
+
+  // The committed real run the board lists (the only one on a fresh clone).
+  const realRunId = 'r-0001';
+  const realRun = JSON.parse(fs.readFileSync(path.join(LEDGER_DIR, `${realRunId}.json`), 'utf8'));
+
+  // a. + b. Open `/`, see the r-0001 card and the summary strip computed from
+  //    it, click into it, see GatesTable.
+  test('board: r-0001 card with the computed summary strip opens into the run with all-pass gates footer', async ({
     page,
   }) => {
     await page.goto('/');
-    // a. The fixture card: runId r-0000, repo JayanthMalladi/shim-demo-app,
-    //    StatusPill "PR opened" (status done → pill text per 02 §6).
-    const card = page.getByLabel('run r-0000');
-    await expect(card).toHaveText(/r-0000/);
+    // a. The r-0001 card: runId, repo, StatusPill "PR opened" (status done →
+    //    pill text per 02 §6). The example fixture (r-0000) is NOT listed.
+    const card = page.getByLabel('run r-0001');
+    await expect(card).toHaveText(/r-0001/);
     await expect(card).toHaveText(/JayanthMalladi\/shim-demo-app/);
     await expect(card).toHaveText(/PR opened/);
+    await expect(page.getByLabel('run r-0000')).toHaveCount(0, 'fixture r-0000 is not a board run');
+
+    // Summary strip (02 §5.1): expected values computed from ledger/r-0001.json
+    // — one listed run; PRs = done-with-PR; decisions; silent findings.
+    const expected = {
+      runs: 1, // on a fresh clone the board lists exactly the one committed real run (r-0001)
+      prs: realRun.status === 'done' && realRun.pr?.url ? 1 : 0,
+      decisions: realRun.decisions?.length ?? 0,
+      silent: realRun.findings?.bySeverity?.silent ?? 0,
+    };
+    await expect
+      .poll(async () => await stripValue(page, 'Runs')).toBe(expected.runs);
+    expect(await stripValue(page, 'PRs opened')).toBe(expected.prs);
+    expect(await stripValue(page, 'Human decisions')).toBe(expected.decisions);
+    expect(await stripValue(page, 'Silent breaks caught')).toBe(expected.silent);
 
     // b. Click the card's stretched link (an <a> filling the whole card,
-    //    02 §5.1 "the whole card links to #/run/<runId>") → #/run/r-0000.
+    //    02 §5.1 "the whole card links to #/run/<runId>") → #/run/r-0001.
     //    Target the card's own hash link, not the nested PR link, so the click
     //    resolves to a single element.
-    await card.locator('a[href="#/run/r-0000"]').click();
-    await expect(page).toHaveURL(/#\/run\/r-0000/);
+    await card.locator('a[href="#/run/r-0001"]').click();
+    await expect(page).toHaveURL(/#\/run\/r-0001/);
 
     // The GatesTable renders with the all-pass footer (02 §5.2 #5):
     // "Every gate that passed before still passes" (gates.regressions is empty).
@@ -126,8 +160,9 @@ if (IS_VITEST) {
 
   // d. Screenshots (02 §7 UI-4 d, 02 §9 "done means"): full-page, 1280x800
   //    viewport, deviceScaleFactor 2, saved to docs/board-runs.png and
-  //    docs/board-run.png. The runs page shows every committed run (fixture
-  //    r-0000 + real r-0001); the detail shot showcases the REAL run r-0001.
+  //    docs/board-run.png. The runs page shows the committed real run(s)
+  //    (r-0001 on a fresh clone; never the r-0000 fixture); the detail shot
+  //    showcases the REAL run r-0001.
   const makeScreenshotContext = (browser: Browser): Promise<BrowserContext> =>
     browser.newContext({
       viewport: { width: 1280, height: 800 },
@@ -139,14 +174,15 @@ if (IS_VITEST) {
     const page = await ctx.newPage();
     try {
       await page.goto('/');
-      await expect(page.getByLabel('run r-0000')).toBeVisible();
+      await expect(page.getByLabel('run r-0001')).toBeVisible();
+      await expect(page.getByLabel('run r-0000')).toHaveCount(0, 'fixture never appears on the board');
       await page.screenshot({
         path: path.join(REPO_ROOT, 'docs', 'board-runs.png'),
         fullPage: true,
       });
 
-      // Detail shot: showcase the REAL run (r-0001). Its gates are all green
-      // with regressions [], so the all-pass footer renders here too.
+      // Detail shot: the real run (r-0001). Its gates are all green with
+      // regressions [], so the all-pass footer renders here too.
       const runPage = await ctx.newPage();
       await runPage.goto('/#/run/r-0001');
       await expect(runPage.getByText('Every gate that passed before still passes')).toBeVisible();

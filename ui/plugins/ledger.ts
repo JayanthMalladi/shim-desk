@@ -15,9 +15,8 @@ const ledgerDir: string = (() => {
   return candidates.find((c) => fs.existsSync(c)) ?? candidates[1];
 })();
 
-// One object per file that parses. runId is read from the parsed JSON so the
-// de-dup key is always the run's own id; the fileName fallback covers a file
-// that lacks a runId (it still counts as a distinct entry).
+// One object per file that parses. runId is read from the parsed JSON; the
+// fileName fallback covers a file that lacks a runId.
 type Entry = {
   fileName: string;
   runId: string;
@@ -25,6 +24,11 @@ type Entry = {
   run: unknown;
 };
 
+// Board listing (02 §1): only real runs — files named r-NNNN.json. The
+// committed test fixture example-r-0000.json is deliberately NOT listed; it
+// exists for ui/test/RunPage.test.tsx, which imports it directly. A fresh
+// clone therefore lists exactly r-0001, and runs written later (e.g. the e2e
+// live test's r-9999.json) still appear.
 function listLedgerFiles(): string[] {
   let names: string[];
   try {
@@ -32,15 +36,7 @@ function listLedgerFiles(): string[] {
   } catch {
     return [];
   }
-  return names.filter(
-    (n) =>
-      n.endsWith('.json') &&
-      // The fixture example-r-0000.json does not match the r-* glob
-      // (lead decision), so the plugin globs r-*.json AND example-*.json and
-      // de-duplicates by runId.
-      (n.startsWith('r-') || n.startsWith('example-')) &&
-      n !== 'schema.json',
-  );
+  return names.filter((n) => /^r-\d{4}\.json$/.test(n));
 }
 
 // Read every ledger file on each call — no cache, so dev polling sees live
@@ -62,16 +58,8 @@ function readRuns(): Entry[] {
     const createdAt = String(parsed?.createdAt ?? '');
     out.push({ fileName, runId, createdAt, run: parsed });
   }
-  // De-dup by runId (r-*.json and example-*.json may share one). A real
-  // r-NNNN.json always wins over the example- prefixed fixture: example files
-  // are processed first so a colliding r- file overwrites them.
-  const isExample = (e: Entry) => e.fileName.startsWith('example-');
-  const ordered = [...out].sort((a, b) => Number(isExample(a)) - Number(isExample(b)));
-  const byRunId = new Map<string, Entry>();
-  for (const e of ordered) byRunId.set(e.runId, e);
-  const runs = [...byRunId.values()];
   // createdAt descending; newest first. Missing/invalid dates sort to the end.
-  runs.sort((a, b) => {
+  out.sort((a, b) => {
     const ta = Date.parse(a.createdAt);
     const tb = Date.parse(b.createdAt);
     if (Number.isNaN(ta) && Number.isNaN(tb)) return 0;
@@ -79,7 +67,7 @@ function readRuns(): Entry[] {
     if (Number.isNaN(tb)) return -1;
     return tb - ta;
   });
-  return runs;
+  return out;
 }
 
 function sendJson(res: unknown, status: number, body: unknown): void {

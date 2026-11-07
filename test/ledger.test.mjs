@@ -337,9 +337,15 @@ function ledgerCli(root, args) {
 
 test("e2e: replay r-0001's sequence and deep-equal the committed ledger on the derived fields", async () => {
   const root = tmpRoot();
-  // report.json drives --auto-fixed-from (the real r-0001 had autoFixed 12)
-  fs.mkdirSync(path.join(root, "work", "r-0001", "shim"), { recursive: true });
-  fs.writeFileSync(path.join(root, "work", "r-0001", "shim", "report.json"), JSON.stringify({ autoFixed: 12 }));
+  // report.json drives --auto-fixed-from (the real r-0001 had autoFixed 12).
+  // `--auto-fixed-from` is resolved by the script relative to the CWD, so on a
+  // fresh clone the relative path would land in the gitignored work/ (absent)
+  // and ENOENT. Pass an ABSOLUTE path into the temp work dir instead, seeded
+  // from the committed fixture — no real work/ folder is read (01 §5.4).
+  const reportDir = path.join(root, "work", "r-0001", "shim");
+  fs.mkdirSync(reportDir, { recursive: true });
+  const reportPath = path.join(reportDir, "report.json");
+  fs.copyFileSync(path.join(repoRoot, "test", "fixtures", "r-0001-report.json"), reportPath);
 
   const fixture = makePrFixture(root);
   const L = (a) => ledgerCli(root, ["--run", "r-0001", ...a]);
@@ -349,7 +355,7 @@ test("e2e: replay r-0001's sequence and deep-equal the committed ledger on the d
   L(["--decision", "node-22", "--choice", "1", "--by", "user"]);
   L(["--decision", "telemetry-needs-otel", "--choice", "1", "--by", "user"]);
   L(["--status", "fixing_deterministic"]);
-  L(["--auto-fixed-from", "work/r-0001/shim/report.json"]);
+  L(["--auto-fixed-from", reportPath]); // absolute: never touches the repo work/
   L(["--status", "fixing_parallel"]);
   const fixes = [
     ["src/typed.ts", "Switched all result reads to finalStep.* to keep v6 last-step semantics"],
